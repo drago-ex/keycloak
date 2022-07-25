@@ -1,0 +1,33 @@
+{
+	"name": "drago-ex/keycloak",
+	"type": "library",
+	"description": "Simple keycloak adapter.",
+	"license": ["MIT"],
+	"authors": [
+		{
+			"name": "Zdeněk Papučík",
+			"homepage": "https://github.com/accgit"
+		}
+	],
+	"require": {
+		"php": ">=8.0",
+		"nette/application": "^3.1",
+		"nette/http": "^3.1",
+		"nette/di": "^3.0",
+		"stevenmaguire/oauth2-keycloak": "^3.1.0"
+	},
+	"require-dev": {
+		"nette/tester": "^2.3",
+		"nette/bootstrap": "^3.0",
+		"tracy/tracy": "^2.9",
+		"phpstan/phpstan-nette": "^0.12"
+	},
+	"autoload": {
+		"classmap": ["src/"]
+	},
+	"scripts": {
+		"phpstan": "phpstan analyse --level 4 --configuration tests/phpstan.neon src",
+		"tester": "tester tests -s",
+		"tester-win": "tester -c tests/php.ini tests -s"
+	}
+}
