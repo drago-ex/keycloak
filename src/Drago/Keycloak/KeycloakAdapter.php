@@ -50,7 +50,6 @@ trait KeycloakAdapter
 
 				// Optional: Now you have a token you can look up a users profile data.
 				try {
-
 					// We got an access token, let's now get the user's details.
 					$session->set('owner', $keycloak->getResourceOwner($session->get('token')));
 
