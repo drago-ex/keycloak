@@ -5,7 +5,7 @@
 <h3 align="center">Drago Extension</h3>
 <p align="center">Simple packages built on Nette Framework</p>
 
-## Drago Authorization
+## Drago Keycloak
 Simple keycloak adapter.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://raw.githubusercontent.com/drago-ex/keycloak/master/license.md)
