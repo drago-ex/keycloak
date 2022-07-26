@@ -16,7 +16,7 @@ use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 
 trait KeycloakAdapter
 {
-	public function injectKeycloakAuth(Presenter $presenter, Keycloak $keycloak, Sessions $sessions): void
+	public function injectKeycloakAuth(Presenter $presenter, Keycloak $keycloak, KeycloakSessions $sessions): void
 	{
 		$presenter->onStartup[] = function () use ($presenter, $keycloak, $sessions) {
 			$state = $presenter->getParameter('state');

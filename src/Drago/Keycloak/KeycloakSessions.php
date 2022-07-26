@@ -16,7 +16,7 @@ use Nette\SmartObject;
 use Stevenmaguire\OAuth2\Client\Provider\KeycloakResourceOwner;
 
 
-class Sessions
+class KeycloakSessions
 {
 	use SmartObject;
 
@@ -67,13 +67,6 @@ class Sessions
 	}
 
 
-	public function getAuthState(): string
-	{
-		return $this->sessionSection
-			->get(self::STATE);
-	}
-
-
 	public function removeAuthState(): void
 	{
 		$this->sessionSection
@@ -88,30 +81,10 @@ class Sessions
 	}
 
 
-	/**
-	 * @return AccessTokenInterface[]
-	 */
-	public function getAccessToken(): array
-	{
-		return $this->sessionSection
-				->get(self::TOKEN) ?? [];
-	}
-
-
 	public function addResourceOwner(KeycloakResourceOwner $resource): void
 	{
 		$this->sessionSection
 			->set(self::RESOURCE, $resource);
-	}
-
-
-	/**
-	 * @return KeycloakResourceOwner[]
-	 */
-	public function getResourceOwner(): array
-	{
-		return $this->sessionSection
-				->get(self::RESOURCE) ?? [];
 	}
 
 
