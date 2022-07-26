@@ -74,6 +74,13 @@ class Sessions
 	}
 
 
+	public function removeAuthState(): void
+	{
+		$this->sessionSection
+			->remove(self::STATE);
+	}
+
+
 	public function addAccessToken(AccessTokenInterface $accessToken): void
 	{
 		$this->sessionSection
