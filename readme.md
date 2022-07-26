@@ -43,16 +43,27 @@ keycloak:
 	# guzzleHttp: []
 ```
 
-## Use trait in presenter
+## Use in presenter
 ```php
 use Drago\Keycloak\KeycloakAdapter
+
+public function __construct(
+    private Keycloak $keycloak,
+    private KeycloakSessions $keycloakSessions,
+    ) {
+        parent::__construct();
+	}
 ```
 
-## Identity is stored in sessions
+### Items from keycloak
 ```php
-$session = $this->getSession()->getSection('keycloak');
-$user = $session->get('owner');
-Debugger::barDump($user);
+
+// state, accessToken and resource owner
+$this->keycloakSessions->getItems();
 ```
 
-We will create the login method ourselves as needed.
+## User logout method
+```php
+$this->keycloakSessions->remove();
+$this->redirectUrl($this->keycloak->getLogoutUrl());
+```
