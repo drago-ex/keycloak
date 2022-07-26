@@ -16,9 +16,9 @@ use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 
 trait KeycloakAdapter
 {
-	public function injectKeycloakAuth(Presenter $presenter, Keycloak $keycloak, KeycloakSessions $sessions): void
+	public function injectKeycloakAuth(Presenter $presenter, Keycloak $keycloak, KeycloakSessions $keycloakSessions): void
 	{
-		$presenter->onStartup[] = function () use ($presenter, $keycloak, $sessions) {
+		$presenter->onStartup[] = function () use ($presenter, $keycloak, $keycloakSessions) {
 			$state = $presenter->getParameter('state');
 			$code = $presenter->getParameter('code');
 
@@ -27,13 +27,13 @@ trait KeycloakAdapter
 				// If we don't have an authorization code then get one.
 				if (!$presenter->getUser()->isLoggedIn()) {
 					$authUrl = $keycloak->getAuthorizationUrl();
-					$sessions->addAuthState($keycloak->getState());
+					$keycloakSessions->addAuthState($keycloak->getState());
 					$presenter->redirectUrl($authUrl);
 				}
 
 				// Check given state against previously stored one to mitigate CSRF attack.
-			} elseif (empty($state) || ($state !== $sessions->getAuthState())) {
-				$sessions->removeAuthState();
+			} elseif (empty($state) || ($state !== $keycloakSessions->getItems()->state)) {
+				$keycloakSessions->removeAuthState();
 				$presenter->error(
 					'Invalid state, make sure HTTP sessions are enabled.',
 					403,
@@ -46,7 +46,7 @@ trait KeycloakAdapter
 					$token = $keycloak->getAccessToken('authorizationCode', [
 						'code' => $code,
 					]);
-					$sessions->addAccessToken($token);
+					$keycloakSessions->addAccessToken($token);
 
 				} catch (Exception $e) {
 					$presenter->error(
@@ -59,7 +59,7 @@ trait KeycloakAdapter
 				try {
 					// We got an access token, let's now get the user's details.
 					$resourceOwner = $keycloak->getResourceOwner($token);
-					$sessions->addResourceOwner($resourceOwner);
+					$keycloakSessions->addResourceOwner($resourceOwner);
 
 				} catch (Exception $e) {
 					$presenter->error(
