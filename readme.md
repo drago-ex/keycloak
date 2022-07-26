@@ -48,10 +48,10 @@ keycloak:
 use Drago\Keycloak\KeycloakAdapter
 
 public function __construct(
-    private Keycloak $keycloak,
-    private KeycloakSessions $keycloakSessions,
-    ) {
-        parent::__construct();
+	private Keycloak $keycloak,
+	private KeycloakSessions $keycloakSessions,
+	) {
+		parent::__construct();
 	}
 ```
 
