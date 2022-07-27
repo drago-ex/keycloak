@@ -9,9 +9,9 @@ declare(strict_types=1);
 
 namespace Drago\Keycloak;
 
-use Exception;
 use Nette\Application\UI\Presenter;
 use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
+use Throwable;
 
 
 trait KeycloakAdapter
@@ -48,7 +48,7 @@ trait KeycloakAdapter
 					]);
 					$keycloakSessions->addAccessToken($token);
 
-				} catch (Exception $e) {
+				} catch (Throwable $e) {
 					$presenter->error(
 						'Failed to get access token: ' . $e->getMessage(),
 						403,
@@ -61,7 +61,7 @@ trait KeycloakAdapter
 					$resourceOwner = $keycloak->getResourceOwner($token);
 					$keycloakSessions->addResourceOwner($resourceOwner);
 
-				} catch (Exception $e) {
+				} catch (Throwable $e) {
 					$presenter->error(
 						'Failed to get resource owner: ' . $e->getMessage(),
 						403,
