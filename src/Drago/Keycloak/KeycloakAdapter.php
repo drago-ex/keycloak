@@ -19,7 +19,7 @@ trait KeycloakAdapter
 	public function injectKeycloakAuth(
 		Presenter $presenter,
 		Keycloak $keycloak,
-		KeycloakSessions $keycloakSessions
+		KeycloakSessions $keycloakSessions,
 	): void {
 		$presenter->onStartup[] = function () use ($presenter, $keycloak, $keycloakSessions) {
 			$state = $presenter->getParameter('state');
