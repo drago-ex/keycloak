@@ -40,11 +40,16 @@ class TestKeycloakExtension extends TestCase
 				clientId: keycloak-client-id
 				clientSecret: keycloak-client-secret
 				redirectUri: https://example.com/callback-url
+
 				# optional
 				encryptionAlgorithm: RS256
 				encryptionKeyPath: ../key.pem
 				encryptionKey: contents_of_key_or_certificate
 				guzzleHttp: []
+
+			services:
+				- Nette\Http\Session
+				- Nette\Http\SessionSection
 			', 'neon'));
 			$compiler->addExtension('keycloak', new KeycloakExtension);
 		});
