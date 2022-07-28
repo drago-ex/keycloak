@@ -50,6 +50,7 @@ class TestKeycloakExtension extends TestCase
 			services:
 				- Nette\Http\Request
 				- Nette\Http\UrlScript
+				- Nette\Http\IResponse
 				- Nette\Http\Session
 			', 'neon'));
 			$compiler->addExtension('keycloak', new KeycloakExtension);
