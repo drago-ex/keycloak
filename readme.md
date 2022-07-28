@@ -4,6 +4,7 @@ Simple keycloak adapter.
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://raw.githubusercontent.com/drago-ex/keycloak/master/license.md)
 [![PHP version](https://badge.fury.io/ph/drago-ex%2Fkeycloak.svg)](https://badge.fury.io/ph/drago-ex%2Fkeycloak)
 [![Coding Style](https://github.com/drago-ex/keycloak/actions/workflows/coding-style.yml/badge.svg)](https://github.com/drago-ex/keycloak/actions/workflows/coding-style.yml)
+[![CodeFactor](https://www.codefactor.io/repository/github/drago-ex/keycloak/badge)](https://www.codefactor.io/repository/github/drago-ex/keycloak)
 
 ## Technology
 - PHP 8.0 or higher
