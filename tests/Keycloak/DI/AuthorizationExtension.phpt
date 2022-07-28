@@ -46,7 +46,7 @@ class TestKeycloakExtension extends TestCase
 				encryptionKey: contents_of_key_or_certificate
 				guzzleHttp: []
 			', 'neon'));
-			$compiler->addExtension('generator', new KeycloakExtension);
+			$compiler->addExtension('keycloak', new KeycloakExtension);
 		});
 		return new $class;
 	}
