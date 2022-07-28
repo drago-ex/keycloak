@@ -8,9 +8,11 @@ declare(strict_types=1);
 
 
 use Drago\Keycloak\DI\KeycloakExtension;
+use Drago\Keycloak\KeycloakSessions;
 use Nette\DI\Compiler;
 use Nette\DI\Container;
 use Nette\DI\ContainerLoader;
+use Tester\Assert;
 use Tester\TestCase;
 
 $container = require __DIR__ . '/../../bootstrap.php';
@@ -47,6 +49,19 @@ class TestKeycloakExtension extends TestCase
 			$compiler->addExtension('generator', new KeycloakExtension);
 		});
 		return new $class;
+	}
+
+
+	private function geClassByType(): KeycloakSessions
+	{
+		return $this->createContainer()
+			->getByType(KeycloakSessions::class);
+	}
+
+
+	public function test01(): void
+	{
+		Assert::type(KeycloakSessions::class, $this->geClassByType());
 	}
 }
 
