@@ -48,8 +48,8 @@ class TestKeycloakExtension extends TestCase
 				guzzleHttp: []
 
 			services:
+				- Nette\Http\Request
 				- Nette\Http\Session
-				- Nette\Http\SessionSection
 			', 'neon'));
 			$compiler->addExtension('keycloak', new KeycloakExtension);
 		});
