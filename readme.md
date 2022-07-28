@@ -6,6 +6,7 @@ Simple keycloak adapter.
 [![Tests](https://github.com/drago-ex/keycloak/actions/workflows/tests.yml/badge.svg)](https://github.com/drago-ex/keycloak/actions/workflows/tests.yml)
 [![Coding Style](https://github.com/drago-ex/keycloak/actions/workflows/coding-style.yml/badge.svg)](https://github.com/drago-ex/keycloak/actions/workflows/coding-style.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/drago-ex/keycloak/badge)](https://www.codefactor.io/repository/github/drago-ex/keycloak)
+[![Coverage Status](https://coveralls.io/repos/github/drago-ex/keycloak/badge.svg?branch=master)](https://coveralls.io/github/drago-ex/keycloak?branch=master)
 
 ## Technology
 - PHP 8.0 or higher
