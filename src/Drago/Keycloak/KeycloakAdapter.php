@@ -29,8 +29,8 @@ trait KeycloakAdapter
 
 				// If we don't have an authorization code then get one.
 				if (!$presenter->getUser()->isLoggedIn()) {
-					$keycloakSessions->addAuthState($keycloak->getState());
 					$authUrl = $keycloak->getAuthorizationUrl();
+					$keycloakSessions->addAuthState($keycloak->getState());
 					$presenter->redirectUrl($authUrl);
 				}
 
