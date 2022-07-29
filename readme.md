@@ -52,7 +52,7 @@ public function __construct(
 	parent::__construct();
 }
 
-// Sample login
+// sample login
 protected function startup(): void
 {
 	parent::startup();
