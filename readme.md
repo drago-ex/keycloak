@@ -48,9 +48,22 @@ use Drago\Keycloak\KeycloakAdapter
 public function __construct(
 	private Keycloak $keycloak,
 	private KeycloakSessions $keycloakSessions,
-	) {
-		parent::__construct();
+) {
+	parent::__construct();
+}
+
+// Sample login
+protected function startup(): void
+{
+	parent::startup();
+	if (!$this->getUser()->isLoggedIn()) {
+		$user = $this->keycloakSessions
+			->getItems()->resourceOwner;
+
+		$this->getUser()->login($user->getName(), $user->getId());
+		$this->redirect('redirect');
 	}
+}
 ```
 
 ### Items from keycloak
