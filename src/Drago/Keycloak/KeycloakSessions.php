@@ -23,6 +23,7 @@ class KeycloakSessions
 	private const STATE = 'oauth2state';
 	private const TOKEN = 'accessToken';
 	private const RESOURCE = 'resourceOwner';
+	private const BACKLINK = 'backlink';
 
 	private SessionSection $sessionSection;
 
@@ -41,6 +42,7 @@ class KeycloakSessions
 			self::STATE,
 			self::TOKEN,
 			self::RESOURCE,
+			self::BACKLINK,
 		];
 	}
 
@@ -56,14 +58,20 @@ class KeycloakSessions
 			$items[self::STATE],
 			$items[self::TOKEN],
 			$items[self::RESOURCE],
+			$items[self::BACKLINK],
 		);
 	}
 
 
-	public function addAuthState(string $state): void
+	public function addAuthState(string $state, ?string $backlink): void
 	{
 		$this->sessionSection
 			->set(self::STATE, $state);
+
+		if ($backlink) {
+			$this->sessionSection
+				->set(self::BACKLINK, $backlink);
+		}
 	}
 
 
