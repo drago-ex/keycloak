@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Drago\Keycloak;
 
-use Nette\Application\UI\Presenter;
 use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 use Throwable;
 
@@ -23,10 +22,7 @@ trait KeycloakAdapter
 	): void
 	{
 		$presenter->onStartup[] = function () use ($presenter, $keycloak, $keycloakSessions) {
-			$state = $presenter->getParameter('state');
-			$code = $presenter->getParameter('code');
-			$backlink = $presenter->getParameter('backlink');
-
+			[$state, $code, $backlink] = array_map(fn($i) => $presenter->getParameter($i), ['state', 'code', 'backlink']);
 			if (!isset($code)) {
 
 				// If we don't have an authorization code then get one.
@@ -53,9 +49,7 @@ trait KeycloakAdapter
 					]);
 					$keycloakSessions->addAccessToken($token);
 					$backlink = $keycloakSessions->getItems()->backlink;
-					if ($backlink) {
-						$presenter->backlink = $backlink;
-					}
+					$presenter->backlink = $backlink;
 
 				} catch (Throwable $e) {
 					$presenter->error(
