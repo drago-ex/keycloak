@@ -24,13 +24,14 @@ trait KeycloakAdapter
 		$presenter->onStartup[] = function () use ($presenter, $keycloak, $keycloakSessions) {
 			$state = $presenter->getParameter('state');
 			$code = $presenter->getParameter('code');
+			$backlink = $presenter->getParameter('backlink');
 
 			if (!isset($code)) {
 
 				// If we don't have an authorization code then get one.
 				if (!$presenter->getUser()->isLoggedIn()) {
 					$authUrl = $keycloak->getAuthorizationUrl();
-					$keycloakSessions->addAuthState($keycloak->getState());
+					$keycloakSessions->addAuthState($keycloak->getState(), $backlink);
 					$presenter->redirectUrl($authUrl);
 				}
 
@@ -50,6 +51,10 @@ trait KeycloakAdapter
 						'code' => $code,
 					]);
 					$keycloakSessions->addAccessToken($token);
+					$backlink = $keycloakSessions->getItems()->backlink;
+					if ($backlink) {
+						$presenter->backlink = $backlink;
+					}
 
 				} catch (Throwable $e) {
 					$presenter->error(
