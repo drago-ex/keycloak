@@ -22,6 +22,7 @@ class Items
 		public ?string $state,
 		public ?AccessTokenInterface $accessToken,
 		public ?KeycloakResourceOwner $resourceOwner,
+		public ?string $backlink,
 	) {
 	}
 }
