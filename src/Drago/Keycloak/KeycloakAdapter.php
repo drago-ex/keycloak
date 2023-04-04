@@ -20,7 +20,8 @@ trait KeycloakAdapter
 		Presenter $presenter,
 		Keycloak $keycloak,
 		KeycloakSessions $keycloakSessions,
-	): void {
+	): void
+	{
 		$presenter->onStartup[] = function () use ($presenter, $keycloak, $keycloakSessions) {
 			$state = $presenter->getParameter('state');
 			$code = $presenter->getParameter('code');
