@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Drago\Keycloak\DI;
 
 use Drago\Keycloak\KeycloakSessions;
+use Drago\Keycloak\Presenter;
 use GuzzleHttp\Client;
 use Nette\DI\CompilerExtension;
 use Nette\Schema\Expect;
@@ -44,6 +45,9 @@ class KeycloakExtension extends CompilerExtension
 
 		$builder->addDefinition($this->prefix('sessions'))
 			->setFactory(KeycloakSessions::class);
+
+		$builder->addDefinition($this->prefix('presenter'))
+			->setFactory(Presenter::class);
 
 		$builder->addDefinition($this->prefix('keycloak'))
 			->setFactory(Keycloak::class)
