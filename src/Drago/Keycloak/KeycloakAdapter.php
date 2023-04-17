@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Drago\Keycloak;
 
+use Nette\Application\UI\Presenter;
 use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 use Throwable;
 
