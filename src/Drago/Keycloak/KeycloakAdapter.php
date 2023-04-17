@@ -49,7 +49,7 @@ trait KeycloakAdapter
 						'code' => $code,
 					]);
 					$keycloakSessions->addAccessToken($token);
-					$backlink = $keycloakSessions->getItems()->backlink;
+					$backlink = $keycloakSessions->getItems()->backlink ?? '';
 					$presenter->backlink = $backlink;
 
 				} catch (Throwable $e) {
