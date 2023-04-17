@@ -46,9 +46,6 @@ class KeycloakExtension extends CompilerExtension
 		$builder->addDefinition($this->prefix('sessions'))
 			->setFactory(KeycloakSessions::class);
 
-		$builder->addDefinition($this->prefix('presenter'))
-			->setFactory(Presenter::class);
-
 		$builder->addDefinition($this->prefix('keycloak'))
 			->setFactory(Keycloak::class)
 			->setArguments([(array) $this->config, ['httpClient' => '@keycloak.guzzleHttp']]);
