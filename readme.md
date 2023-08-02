@@ -31,6 +31,7 @@ keycloak:
 	clientId: keycloak-client-id
 	clientSecret: keycloak-client-secret
 	redirectUri: https://example.com/callback-url
+	# version: 21.0.1
 
 	# optional
 	# encryptionAlgorithm: 'RS256'
@@ -52,18 +53,72 @@ public function __construct(
 	parent::__construct();
 }
 
-// sample login
+// simple login
 protected function startup(): void
 {
 	parent::startup();
 	if (!$this->getUser()->isLoggedIn()) {
-		$user = $this->keycloakSessions
+		$keycloakUser = $this->keycloakSessions
 			->getItems()->resourceOwner;
 
-		$this->getUser()->login($user->getName(), $user->getId());
+		$this->getUser()->login($keycloakUser->getName(), $keycloakUser->getId());
 		$this->redirect('redirect');
 	}
 }
+
+// own and authenticator and check attributes from keylocker and backlink
+protected function startup(): void
+{
+	parent::startup();
+	if (!$this->getUser()->isLoggedIn()) {
+		$keycloakUser = $this->keycloakSessions
+			->getItems()->resourceOwner;
+
+		try {
+			if ($keycloakUser) {
+				$user = $this->getUser();
+
+				// own authenticator
+				$user->setAuthenticator($this->authRepository);
+
+				// user login
+				$user->login($keycloakUser->getName(), $keycloakUser->getId());
+
+				// backlink, redirecting back to the page after login
+				$this->restoreRequest($this->backlink);
+				$this->redirect(':Backend:Admin:');
+			}
+
+		// check attributes from keylocker
+		} catch (AuthenticationException $e) {
+			if ($e->getCode() === 1) {
+				$this->template->userLoginError = true;
+				$this->getUserLogout();
+				$redirect = $this->keycloak->getLogoutUrl();
+				header('refresh:6; url=' . $redirect);
+			}
+		}
+	}
+}
+
+
+private function getUserLogout(): void
+{
+	$this->getUser()->logout();
+	$this->keycloakSessions->remove();
+}
+```
+
+### Error message in @layout.latte
+```latte
+<body n:ifset="$userLoginError">
+	<h1 class="text-danger text-center mt-5">
+		{_'The user does not have the required attributes set in keycloak.'}
+	</h1>
+</body>
+<body n:if="$user->loggedIn">
+	...
+</body>
 ```
 
 ### Items from keycloak
