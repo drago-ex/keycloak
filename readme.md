@@ -66,7 +66,7 @@ protected function startup(): void
 	}
 }
 
-// own and authenticator and check attributes from keylocker and backlink
+// own authenticator, check attributes from keylocker, backlink
 protected function startup(): void
 {
 	parent::startup();
