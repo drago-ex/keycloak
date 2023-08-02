@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Drago\Keycloak\DI;
 
 use Drago\Keycloak\KeycloakSessions;
-use Drago\Keycloak\Presenter;
 use GuzzleHttp\Client;
 use Nette\DI\CompilerExtension;
 use Nette\Schema\Expect;
