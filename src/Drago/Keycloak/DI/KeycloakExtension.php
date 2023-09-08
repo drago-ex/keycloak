@@ -25,13 +25,13 @@ class KeycloakExtension extends CompilerExtension
 			'authServerUrl' => Expect::string(),
 			'realm' => Expect::string(),
 			'clientId' => Expect::string(),
-			'clientSecret' => Expect::string()->nullable(),
+			'clientSecret' => Expect::string(null),
 			'redirectUri' => Expect::string(),
-			'encryptionAlgorithm' => Expect::string()->nullable(),
-			'encryptionKeyPath' => Expect::string()->nullable(),
-			'encryptionKey' => Expect::string()->nullable(),
-			'version' => Expect::string()->nullable(),
+			'encryptionAlgorithm' => Expect::string(null),
+			'encryptionKeyPath' => Expect::string(null),
+			'encryptionKey' => Expect::string(null),
 			'guzzleHttp' => Expect::array(),
+			'version' => Expect::string(null),
 		]);
 	}
 
@@ -41,7 +41,7 @@ class KeycloakExtension extends CompilerExtension
 		$builder = $this->getContainerBuilder();
 		$builder->addDefinition($this->prefix('guzzleHttp'))
 			->setFactory(Client::class)
-			->setArguments([(array) $this->config['guzzleHttp']]);
+			->setArguments([(array) $this->config->guzzleHttp]);
 
 		$builder->addDefinition($this->prefix('sessions'))
 			->setFactory(KeycloakSessions::class);
