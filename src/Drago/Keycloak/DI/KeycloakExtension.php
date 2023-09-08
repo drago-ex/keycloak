@@ -25,12 +25,12 @@ class KeycloakExtension extends CompilerExtension
 			'authServerUrl' => Expect::string(),
 			'realm' => Expect::string(),
 			'clientId' => Expect::string(),
-			'clientSecret' => Expect::string(),
+			'clientSecret' => Expect::string()->nullable(),
 			'redirectUri' => Expect::string(),
-			'encryptionAlgorithm' => Expect::string(),
-			'encryptionKeyPath' => Expect::string(),
-			'encryptionKey' => Expect::string(),
-			'version' => Expect::string(),
+			'encryptionAlgorithm' => Expect::string()->nullable(),
+			'encryptionKeyPath' => Expect::string()->nullable(),
+			'encryptionKey' => Expect::string()->nullable(),
+			'version' => Expect::string()->nullable(),
 			'guzzleHttp' => Expect::array(),
 		]);
 	}
