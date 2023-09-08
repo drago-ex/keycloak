@@ -38,10 +38,11 @@ class KeycloakExtension extends CompilerExtension
 
 	public function loadConfiguration(): void
 	{
+		$config = (array) $this->config;
 		$builder = $this->getContainerBuilder();
 		$builder->addDefinition($this->prefix('guzzleHttp'))
 			->setFactory(Client::class)
-			->setArguments([(array) $this->config->guzzleHttp]);
+			->setArguments([(array) $config['guzzleHttp']]);
 
 		$builder->addDefinition($this->prefix('sessions'))
 			->setFactory(KeycloakSessions::class);
