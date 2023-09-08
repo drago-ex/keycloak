@@ -31,15 +31,15 @@ keycloak:
 	clientId: keycloak-client-id
 	clientSecret: keycloak-client-secret
 	redirectUri: https://example.com/callback-url
-	# version: 21.0.1
 
 	# optional
+	# version: 21.0.1
 	# encryptionAlgorithm: 'RS256'
 	# encryptionKeyPath: '../key.pem'
 	# encryptionKey: 'contents_of_key_or_certificate'
 
 	# https://github.com/guzzle/guzzle
-	# guzzleHttp: []
+	# guzzleHttp:
 ```
 
 ## Use in presenter
