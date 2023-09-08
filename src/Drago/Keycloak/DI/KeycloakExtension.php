@@ -30,8 +30,8 @@ class KeycloakExtension extends CompilerExtension
 			'encryptionAlgorithm' => Expect::string(),
 			'encryptionKeyPath' => Expect::string(),
 			'encryptionKey' => Expect::string(),
-			'guzzleHttp' => Expect::array(),
 			'version' => Expect::string(),
+			'guzzleHttp' => Expect::array(),
 		]);
 	}
 
