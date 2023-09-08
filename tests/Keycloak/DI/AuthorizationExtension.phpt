@@ -40,15 +40,12 @@ class TestKeycloakExtension extends TestCase
 				clientId: keycloak-client-id
 				clientSecret: keycloak-client-secret
 				redirectUri: https://example.com/callback-url
-				version: 21.0.1
 
 				# optional
 				encryptionAlgorithm: RS256
 				encryptionKeyPath: ../key.pem
 				encryptionKey: contents_of_key_or_certificate
-				guzzleHttp: [
-					verify: false,
-				]
+				guzzleHttp: []
 
 			services:
 				- Nette\Http\Request
