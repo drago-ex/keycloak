@@ -20,10 +20,10 @@ class KeycloakSessions
 {
 	use SmartObject;
 
-	private const STATE = 'oauth2state';
-	private const TOKEN = 'accessToken';
-	private const RESOURCE = 'resourceOwner';
-	private const BACKLINK = 'backlink';
+	private const State = 'oauth2state';
+	private const Token = 'accessToken';
+	private const Resource = 'resourceOwner';
+	private const Backlink = 'backlink';
 
 	private SessionSection $sessionSection;
 
@@ -39,10 +39,10 @@ class KeycloakSessions
 	private function items(): array
 	{
 		return [
-			self::STATE,
-			self::TOKEN,
-			self::RESOURCE,
-			self::BACKLINK,
+			self::State,
+			self::Token,
+			self::Resource,
+			self::Backlink,
 		];
 	}
 
@@ -55,10 +55,10 @@ class KeycloakSessions
 		}
 
 		return new Items(
-			$items[self::STATE],
-			$items[self::TOKEN],
-			$items[self::RESOURCE],
-			$items[self::BACKLINK],
+			$items[self::State],
+			$items[self::Token],
+			$items[self::Resource],
+			$items[self::Backlink],
 		);
 	}
 
@@ -66,11 +66,11 @@ class KeycloakSessions
 	public function addAuthState(string $state, ?string $backlink): void
 	{
 		$this->sessionSection
-			->set(self::STATE, $state);
+			->set(self::State, $state);
 
 		if ($backlink) {
 			$this->sessionSection
-				->set(self::BACKLINK, $backlink);
+				->set(self::Backlink, $backlink);
 		}
 	}
 
@@ -78,21 +78,21 @@ class KeycloakSessions
 	public function removeAuthState(): void
 	{
 		$this->sessionSection
-			->remove(self::STATE);
+			->remove(self::State);
 	}
 
 
 	public function addAccessToken(AccessTokenInterface $accessToken): void
 	{
 		$this->sessionSection
-			->set(self::TOKEN, $accessToken);
+			->set(self::Token, $accessToken);
 	}
 
 
 	public function addResourceOwner(KeycloakResourceOwner $resource): void
 	{
 		$this->sessionSection
-			->set(self::RESOURCE, $resource);
+			->set(self::Resource, $resource);
 	}
 
 
