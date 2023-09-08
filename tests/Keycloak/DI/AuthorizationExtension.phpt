@@ -46,7 +46,7 @@ class TestKeycloakExtension extends TestCase
 				encryptionAlgorithm: RS256
 				encryptionKeyPath: ../key.pem
 				encryptionKey: contents_of_key_or_certificate
-				guzzleHttp: []
+				guzzleHttp:
 
 			services:
 				- Nette\Http\Request
