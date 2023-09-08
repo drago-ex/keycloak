@@ -42,6 +42,7 @@ class TestKeycloakExtension extends TestCase
 				redirectUri: https://example.com/callback-url
 
 				# optional
+				version: 21.0.1
 				encryptionAlgorithm: RS256
 				encryptionKeyPath: ../key.pem
 				encryptionKey: contents_of_key_or_certificate
