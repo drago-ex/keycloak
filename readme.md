@@ -9,7 +9,7 @@ Simple keycloak adapter.
 [![Coverage Status](https://coveralls.io/repos/github/drago-ex/keycloak/badge.svg?branch=master)](https://coveralls.io/github/drago-ex/keycloak?branch=master)
 
 ## Technology
-- PHP 8.0 or higher
+- PHP 8.1 or higher
 - composer
 
 ## Installation
