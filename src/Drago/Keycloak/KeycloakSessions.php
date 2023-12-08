@@ -12,14 +12,11 @@ namespace Drago\Keycloak;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 use Nette\Http\Session;
 use Nette\Http\SessionSection;
-use Nette\SmartObject;
 use Stevenmaguire\OAuth2\Client\Provider\KeycloakResourceOwner;
 
 
 class KeycloakSessions
 {
-	use SmartObject;
-
 	private const State = 'oauth2state';
 	private const Token = 'accessToken';
 	private const Resource = 'resourceOwner';
