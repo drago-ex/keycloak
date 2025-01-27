@@ -15,24 +15,37 @@ use Nette\Http\SessionSection;
 use Stevenmaguire\OAuth2\Client\Provider\KeycloakResourceOwner;
 
 
+/**
+ * Manages Keycloak session data including auth state, access token, and resource owner.
+ */
 class KeycloakSessions
 {
-	private const State = 'oauth2state';
-	private const Token = 'accessToken';
-	private const Resource = 'resourceOwner';
-	private const Backlink = 'backlink';
+	private const string State = 'oauth2state';
+	private const string Token = 'accessToken';
+	private const string Resource = 'resourceOwner';
+	private const string Backlink = 'backlink';
 
 	private SessionSection $sessionSection;
 
 
+	/**
+	 * Constructor to initialize the session section.
+	 *
+	 * @param Session $session The Nette session to be used for storing data.
+	 */
 	public function __construct(
 		private readonly Session $session,
 	) {
 		$this->sessionSection = $this->session
-			->getSection(self::class);
+			->getSection(self::class);  // Initialize the session section specific to this class.
 	}
 
 
+	/**
+	 * Returns the list of session item keys.
+	 *
+	 * @return string[] The list of keys for the session items.
+	 */
 	private function items(): array
 	{
 		return [
@@ -44,6 +57,11 @@ class KeycloakSessions
 	}
 
 
+	/**
+	 * Retrieves session items (auth state, token, resource owner, backlink).
+	 *
+	 * @return Items The session items encapsulated in the Items object.
+	 */
 	public function getItems(): Items
 	{
 		$items = [];
@@ -60,6 +78,12 @@ class KeycloakSessions
 	}
 
 
+	/**
+	 * Adds auth state and optionally a backlink to the session.
+	 *
+	 * @param string $state The OAuth2 state to be stored in the session.
+	 * @param string|null $backlink An optional URL to be stored as the backlink.
+	 */
 	public function addAuthState(string $state, ?string $backlink): void
 	{
 		$this->sessionSection
@@ -72,6 +96,9 @@ class KeycloakSessions
 	}
 
 
+	/**
+	 * Removes the auth state from the session.
+	 */
 	public function removeAuthState(): void
 	{
 		$this->sessionSection
@@ -79,6 +106,11 @@ class KeycloakSessions
 	}
 
 
+	/**
+	 * Adds an access token to the session.
+	 *
+	 * @param AccessTokenInterface $accessToken The OAuth2 access token to store.
+	 */
 	public function addAccessToken(AccessTokenInterface $accessToken): void
 	{
 		$this->sessionSection
@@ -86,6 +118,11 @@ class KeycloakSessions
 	}
 
 
+	/**
+	 * Adds a resource owner object to the session.
+	 *
+	 * @param KeycloakResourceOwner $resource The Keycloak resource owner to store.
+	 */
 	public function addResourceOwner(KeycloakResourceOwner $resource): void
 	{
 		$this->sessionSection
@@ -93,6 +130,9 @@ class KeycloakSessions
 	}
 
 
+	/**
+	 * Removes all session data associated with Keycloak authentication.
+	 */
 	public function remove(): void
 	{
 		foreach ($this->items() as $item) {

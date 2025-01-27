@@ -1,5 +1,5 @@
 ## Drago Keycloak
-Simple keycloak adapter.
+Simple Keycloak adapter for easy integration.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://raw.githubusercontent.com/drago-ex/keycloak/master/license.md)
 [![PHP version](https://badge.fury.io/ph/drago-ex%2Fkeycloak.svg)](https://badge.fury.io/ph/drago-ex%2Fkeycloak)
@@ -9,7 +9,7 @@ Simple keycloak adapter.
 [![Coverage Status](https://coveralls.io/repos/github/drago-ex/keycloak/badge.svg?branch=master)](https://coveralls.io/github/drago-ex/keycloak?branch=master)
 
 ## Technology
-- PHP 8.1 or higher
+- PHP 8.3 or higher
 - composer
 
 ## Installation
@@ -17,7 +17,7 @@ Simple keycloak adapter.
 composer require drago-ex/keycloak
 ```
 
-## Extension registration
+## Extension registration in `config.neon`
 ```neon
 extensions:
 	keycloak: Drago\Keycloak\DI\KeycloakExtension
@@ -42,74 +42,70 @@ keycloak:
 	# guzzleHttp:
 ```
 
-## Use in presenter
+## Usage in Presenter
 ```php
-use Drago\Keycloak\KeycloakAdapter
+use Drago\Keycloak\KeycloakAdapter;
 
 public function __construct(
-	private Keycloak $keycloak,
-	private KeycloakSessions $keycloakSessions,
+  private Keycloak $keycloak,
+  private KeycloakSessions $keycloakSessions,
 ) {
-	parent::__construct();
+  parent::__construct();
 }
 
-// simple login
+// Simple login
 protected function startup(): void
 {
-	parent::startup();
-	if (!$this->getUser()->isLoggedIn()) {
-		$keycloakUser = $this->keycloakSessions
-			->getItems()->resourceOwner;
-
-		$this->getUser()->login($keycloakUser->getName(), $keycloakUser->getId());
-		$this->redirect('redirect');
-	}
+  parent::startup();
+  if (!$this->getUser()->isLoggedIn()) {
+    $keycloakUser = $this->keycloakSessions->getItems()->resourceOwner;
+    $this->getUser()->login($keycloakUser->getName(), $keycloakUser->getId());
+    $this->redirect('redirect');
+  }
 }
 
-// own authenticator, check attributes from keycloak, backlink
+// Custom authentication with Keycloak attributes and backlink
 protected function startup(): void
 {
-	parent::startup();
-	if (!$this->getUser()->isLoggedIn()) {
-		$keycloakUser = $this->keycloakSessions
-			->getItems()->resourceOwner;
+  parent::startup();
+  if (!$this->getUser()->isLoggedIn()) {
+    $keycloakUser = $this->keycloakSessions->getItems()->resourceOwner;
 
-		try {
-			if ($keycloakUser) {
-				$user = $this->getUser();
+    try {
+      if ($keycloakUser) {
+        $user = $this->getUser();
+        
+        // Custom authenticator
+        $user->setAuthenticator($this->authRepository);
 
-				// own authenticator
-				$user->setAuthenticator($this->authRepository);
+        // User login
+        $user->login($keycloakUser->getName(), $keycloakUser->getId());
 
-				// user login
-				$user->login($keycloakUser->getName(), $keycloakUser->getId());
+        // Backlink handling
+        $this->restoreRequest($this->backlink);
+        $this->redirect(':Backend:Admin:');
+      }
 
-				// backlink, redirecting back to the page after login
-				$this->restoreRequest($this->backlink);
-				$this->redirect(':Backend:Admin:');
-			}
-
-		// check attributes from keylocker
-		} catch (AuthenticationException $e) {
-			if ($e->getCode() === 1) {
-				$this->template->userLoginError = true;
-				$this->getUserLogout();
-				$redirect = $this->keycloak->getLogoutUrl();
-				header('refresh:6; url=' . $redirect);
-			}
-		}
-	}
+    } catch (AuthenticationException $e) {
+      if ($e->getCode() === 1) {
+        $this->template->userLoginError = true;
+        $this->getUserLogout();
+        $redirect = $this->keycloak->getLogoutUrl();
+        header('refresh:6; url=' . $redirect);
+      }
+    }
+  }
 }
 
-
+// User logout
 private function getUserLogout(): void
 {
-	$this->getUser()->logout();
-	$this->keycloakSessions->remove();
+  $this->getUser()->logout();
+  $this->keycloakSessions->remove();
 }
 ```
 
-### Error message in @layout.latte
+### Error message in `@layout.latte`
 ```latte
 <body n:ifset="$userLoginError">
 	<h1 class="text-danger text-center mt-5">
@@ -121,14 +117,14 @@ private function getUserLogout(): void
 </body>
 ```
 
-### Items from keycloak
+### Items from Keycloak
 ```php
 
-// state, accessToken and resource owner
+// Get state, accessToken, and resource owner
 $this->keycloakSessions->getItems();
 ```
 
-## User logout method
+## User Logout Method
 ```php
 $this->keycloakSessions->remove();
 $this->redirectUrl($this->keycloak->getLogoutUrl());
