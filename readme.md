@@ -74,7 +74,7 @@ protected function startup(): void
     try {
       if ($keycloakUser) {
         $user = $this->getUser();
-        
+
         // Custom authenticator
         $user->setAuthenticator($this->authRepository);
 
