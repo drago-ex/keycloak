@@ -19,7 +19,7 @@ const TempDir = __DIR__ . '/tmp';
 @mkdir(dirname(TempDir));
 @mkdir(TempDir);
 
-$boot = new Configurator();
+$boot = new Configurator;
 $boot->setTempDirectory(TempDir);
 $boot->createRobotLoader()
 	->addDirectory(__DIR__)

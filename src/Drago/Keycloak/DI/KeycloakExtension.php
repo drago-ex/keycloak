@@ -17,7 +17,6 @@ use Nette\Http\Url;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
-use Tracy\Debugger;
 
 class KeycloakExtension extends CompilerExtension
 {
@@ -66,6 +65,6 @@ class KeycloakExtension extends CompilerExtension
 		$request = $builder->getByType(Request::class);
 
 		$builder->addDefinition($this->prefix('keycloak'))
-			->setFactory([ KeycloakExtension::class, 'createKeycloak' ], ['@'.$request, $config, '@keycloak.guzzleHttp']);
+			->setFactory([self::class, 'createKeycloak'], ['@' . $request, $config, '@keycloak.guzzleHttp']);
 	}
 }
