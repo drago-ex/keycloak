@@ -14,7 +14,7 @@
 		"nette/application": "^3.1",
 		"nette/http": "^3.1",
 		"nette/di": "^3.0",
-		"stevenmaguire/oauth2-keycloak": "^4.0.0"
+		"stevenmaguire/oauth2-keycloak": "^6.1"
 	},
 	"require-dev": {
 		"nette/tester": "^2.3",
@@ -27,7 +27,6 @@
 	},
 	"scripts": {
 		"phpstan": "phpstan analyse --level 5 --configuration tests/phpstan.neon src",
-		"tester": "tester tests -s",
-		"tester-win": "tester -c tests/php.ini tests -s"
+		"tester": "tester tests -s"
 	}
 }
