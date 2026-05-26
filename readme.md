@@ -43,6 +43,7 @@ keycloak:
 ```
 
 ## Usage in Presenter
+In the presenter where you want to use Keycloak, we will extend it with BasePresenter.
 ```php
 use Drago\Keycloak\KeycloakAdapter;
 
