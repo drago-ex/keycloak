@@ -6,3 +6,6 @@ parameters:
     paths:
         - src
         - tests
+
+    ignoreErrors:
+        - '#Access to an undefined property Nette\\Application\\UI\\Presenter::\$backlink#'

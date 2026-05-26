@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drago\Keycloak;
 
 use League\OAuth2\Client\Token\AccessToken;
+use Nette\Application\UI\Presenter;
 use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 use Throwable;
 
@@ -14,7 +15,7 @@ trait KeycloakAdapter
 {
 	/** Injects the Keycloak authentication flow into the presenter startup. */
 	public function injectKeycloakAuth(
-		BasePresenter $presenter,
+		Presenter $presenter,
 		Keycloak $keycloak,
 		KeycloakSessions $keycloakSessions,
 	): void
