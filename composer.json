@@ -14,7 +14,7 @@
 		"nette/application": "^3.1",
 		"nette/http": "^3.1",
 		"nette/di": "^3.0",
-	  	"nette/security": "^3.2",
+		"nette/security": "^3.2",
 		"stevenmaguire/oauth2-keycloak": "^6.1"
 	},
 	"require-dev": {
