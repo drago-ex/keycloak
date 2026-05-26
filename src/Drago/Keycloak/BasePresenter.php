@@ -12,5 +12,5 @@ use Nette\Application\UI\Presenter;
 class BasePresenter extends Presenter
 {
 	#[Persistent]
-	public ?string $backlink = null;
+	public string $backlink = '';
 }
