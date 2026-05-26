@@ -6,7 +6,6 @@
 
 declare(strict_types=1);
 
-
 use Drago\Keycloak\DI\KeycloakExtension;
 use Drago\Keycloak\KeycloakSessions;
 use Nette\DI\Compiler;
@@ -15,23 +14,14 @@ use Nette\DI\ContainerLoader;
 use Tester\Assert;
 use Tester\TestCase;
 
-$container = require __DIR__ . '/../../bootstrap.php';
+require __DIR__ . '/../../bootstrap.php';
 
 
 class TestKeycloakExtension extends TestCase
 {
-	protected Container $container;
-
-
-	public function __construct(Container $container)
+	private function createContainer(): Container
 	{
-		$this->container = $container;
-	}
-
-
-	public function createContainer(): Container
-	{
-		$loader = new ContainerLoader($this->container->getParameters()['tempDir'], true);
+		$loader = new ContainerLoader(TempDir, true);
 		$class = $loader->load(function (Compiler $compiler): void {
 			$compiler->loadConfig(Tester\FileMock::create('
 			keycloak:
@@ -60,7 +50,7 @@ class TestKeycloakExtension extends TestCase
 	}
 
 
-	private function geClassByType(): KeycloakSessions
+	private function getClassByType(): KeycloakSessions
 	{
 		return $this->createContainer()
 			->getByType(KeycloakSessions::class);
@@ -69,8 +59,8 @@ class TestKeycloakExtension extends TestCase
 
 	public function test01(): void
 	{
-		Assert::type(KeycloakSessions::class, $this->geClassByType());
+		Assert::type(KeycloakSessions::class, $this->getClassByType());
 	}
 }
 
-(new TestKeycloakExtension($container))->run();
+(new TestKeycloakExtension)->run();

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * Drago Extension
- * Package built on Nette Framework
- */
-
 declare(strict_types=1);
 
 namespace Drago\Keycloak\DI;
@@ -18,6 +13,8 @@ use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 
+
+/** Nette DI extension for integrating Keycloak authentication. */
 class KeycloakExtension extends CompilerExtension
 {
 	public function getConfigSchema(): Schema
@@ -37,9 +34,14 @@ class KeycloakExtension extends CompilerExtension
 	}
 
 
-	public static function createKeycloak($request, $config, $guzzleHttp): Keycloak
+	/** @param array<string, mixed> $config */
+	public static function createKeycloak(Request $request, array $config, Client $guzzleHttp): Keycloak
 	{
-		$redirectUrl = new Url($config['redirectUri']);
+		$redirectUri = isset($config['redirectUri']) && is_string($config['redirectUri'])
+			? $config['redirectUri']
+			: '';
+
+		$redirectUrl = new Url($redirectUri);
 		if ($redirectUrl->getHostUrl() === '') {
 			$config['redirectUri'] = $request->getUrl()
 				->withPath($redirectUrl->getPath())
@@ -53,8 +55,10 @@ class KeycloakExtension extends CompilerExtension
 
 	public function loadConfiguration(): void
 	{
+		/** @var array<string, mixed> $config */
 		$config = (array) $this->config;
 		$builder = $this->getContainerBuilder();
+
 		$builder->addDefinition($this->prefix('guzzleHttp'))
 			->setFactory(Client::class)
 			->setArguments([$config['guzzleHttp']]);
