@@ -110,12 +110,12 @@ private function getUserLogout(): void
 ```latte
 <body>
 {ifset $userLoginError}
-	<h1 class="text-danger text-center mt-5">
-		{_'The user does not have the required attributes set in keycloak.'}
-	</h1>
+    <h1 class="text-danger text-center mt-5">
+        {_'The user does not have the required attributes set in keycloak.'}
+    </h1>
 {else}
     {if $user->isLoggedIn()}
-	...
+        ...
     {/if}
 {/ifset}
 </body>
