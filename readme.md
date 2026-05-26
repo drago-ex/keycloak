@@ -111,7 +111,7 @@ private function getUserLogout(): void
 <body>
 {ifset $userLoginError}
     <h1 class="text-danger text-center mt-5">
-        {_'The user does not have the required attributes set in keycloak.'}
+        The user does not have the required attributes set in keycloak.
     </h1>
 {else}
     {if $user->isLoggedIn()}
