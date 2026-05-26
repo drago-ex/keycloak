@@ -9,7 +9,7 @@ use Nette\Application\UI\Presenter;
 
 
 /** Base presenter with backlink support. */
-class BasePresenter extends Presenter
+abstract class BasePresenter extends Presenter
 {
 	#[Persistent]
 	public string $backlink = '';
