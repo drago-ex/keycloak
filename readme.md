@@ -113,7 +113,7 @@ private function getUserLogout(): void
 		{_'The user does not have the required attributes set in keycloak.'}
 	</h1>
 </body>
-<body n:if="$user->loggedIn">
+<body n:if="$user->isLoggedIn()">
 	...
 </body>
 ```
