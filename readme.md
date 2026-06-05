@@ -91,8 +91,8 @@ protected function startup(): void
       if ($e->getCode() === 1) {
         $this->template->userLoginError = true;
         $this->getUserLogout();
-        $redirect = $this->keycloak->getLogoutUrl();
-        header('refresh:6; url=' . $redirect);
+		$redirect = $this->keycloak->getLogoutUrl();
+		$this->getHttpResponse()->setHeader('Refresh', '6; url=' . $redirect);
       }
     }
   }
