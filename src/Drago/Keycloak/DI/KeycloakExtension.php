@@ -54,7 +54,7 @@ class KeycloakExtension extends CompilerExtension
 
 	public function loadConfiguration(): void
 	{
-		/** @temp array<string, mixed> $config */
+		/** @var array<string, mixed> $config */
 		$config = (array) $this->config;
 		$builder = $this->getContainerBuilder();
 
