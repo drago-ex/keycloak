@@ -9,10 +9,8 @@ use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 use Throwable;
 
 
-/** Trait for integrating Keycloak authentication into Nette presenters. */
 trait KeycloakAdapter
 {
-	/** Injects the Keycloak authentication flow into the presenter startup. */
 	public function injectKeycloakAuth(
 		BasePresenter $presenter,
 		Keycloak $keycloak,

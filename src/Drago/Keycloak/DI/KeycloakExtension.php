@@ -14,7 +14,6 @@ use Nette\Schema\Schema;
 use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 
 
-/** Nette DI extension for integrating Keycloak authentication. */
 class KeycloakExtension extends CompilerExtension
 {
 	public function getConfigSchema(): Schema
@@ -55,7 +54,7 @@ class KeycloakExtension extends CompilerExtension
 
 	public function loadConfiguration(): void
 	{
-		/** @var array<string, mixed> $config */
+		/** @temp array<string, mixed> $config */
 		$config = (array) $this->config;
 		$builder = $this->getContainerBuilder();
 

@@ -40,7 +40,6 @@ class KeycloakSessions
 	}
 
 
-	/** Retrieves session items (auth state, token, resource owner, backlink). */
 	public function getItems(): Items
 	{
 		$state = $this->sessionSection->get(self::State);
@@ -57,7 +56,6 @@ class KeycloakSessions
 	}
 
 
-	/** Adds auth state and optionally a backlink to the session. */
 	public function addAuthState(string $state, ?string $backlink): void
 	{
 		$this->sessionSection->set(self::State, $state);
@@ -68,28 +66,24 @@ class KeycloakSessions
 	}
 
 
-	/** Removes the auth state from the session. */
 	public function removeAuthState(): void
 	{
 		$this->sessionSection->remove(self::State);
 	}
 
 
-	/** Adds an access token to the session. */
 	public function addAccessToken(AccessTokenInterface $accessToken): void
 	{
 		$this->sessionSection->set(self::Token, $accessToken);
 	}
 
 
-	/** Adds a resource owner object to the session. */
 	public function addResourceOwner(KeycloakResourceOwner $resource): void
 	{
 		$this->sessionSection->set(self::Resource, $resource);
 	}
 
 
-	/** Removes all session data associated with Keycloak authentication. */
 	public function remove(): void
 	{
 		foreach ($this->items() as $item) {
