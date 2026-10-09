@@ -8,16 +8,19 @@ Simple Keycloak adapter for easy integration.
 [![Coding Style](https://github.com/drago-ex/keycloak/actions/workflows/coding-style.yml/badge.svg)](https://github.com/drago-ex/keycloak/actions/workflows/coding-style.yml)
 
 ## Requirements
+
 - PHP >= 8.3
 - Nette Framework
 - Composer
 
 ## Installation
+
 ```
 composer require drago-ex/keycloak
 ```
 
 ## Extension Registration
+
 ```neon
 extensions:
 	keycloak: Drago\Keycloak\DI\KeycloakExtension
@@ -43,6 +46,7 @@ keycloak:
 ```
 
 ## Usage in Presenter
+
 In the presenter where you want to use Keycloak, we will extend it with `Drago\Keycloak\BasePresenter`
 ```php
 use Drago\Keycloak\KeycloakAdapter;
@@ -107,6 +111,7 @@ private function getUserLogout(): void
 ```
 
 ### Error message in `@layout.latte`
+
 ```latte
 <body>
 {ifset $userLoginError}
@@ -122,6 +127,7 @@ private function getUserLogout(): void
 ```
 
 ### Items from Keycloak
+
 ```php
 
 // Get state, accessToken, and resource owner
@@ -129,6 +135,7 @@ $this->keycloakSessions->getItems();
 ```
 
 ## User Logout Method
+
 ```php
 $this->keycloakSessions->remove();
 $this->redirectUrl($this->keycloak->getLogoutUrl());
