@@ -28,18 +28,6 @@ class KeycloakSessions
 	}
 
 
-	/** @return list<string> */
-	private function items(): array
-	{
-		return [
-			self::State,
-			self::Token,
-			self::Resource,
-			self::Backlink,
-		];
-	}
-
-
 	public function getItems(): Items
 	{
 		$state = $this->sessionSection->get(self::State);
@@ -89,5 +77,17 @@ class KeycloakSessions
 		foreach ($this->items() as $item) {
 			$this->sessionSection->remove($item);
 		}
+	}
+
+
+	/** @return list<string> */
+	private function items(): array
+	{
+		return [
+			self::State,
+			self::Token,
+			self::Resource,
+			self::Backlink,
+		];
 	}
 }
