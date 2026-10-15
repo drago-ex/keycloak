@@ -2,7 +2,7 @@
 	"name": "drago-ex/keycloak",
 	"description": "Simple Keycloak adapter for easy integration.",
 	"type": "library",
-	"license": ["MIT"],
+	"license": "MIT",
 	"authors": [
 		{
 			"name": "Zdeněk Papučík",
@@ -25,7 +25,9 @@
 		"phpstan/phpstan-nette": "^2.0"
 	},
 	"autoload": {
-		"classmap": ["src/"],
+		"classmap": [
+			"src/"
+		],
 		"psr-4": {
 			"Drago\\": "src"
 		}
