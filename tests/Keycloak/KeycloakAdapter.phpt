@@ -13,7 +13,6 @@ use League\OAuth2\Client\Token\AccessToken;
 use Nette\Application\AbortException;
 use Nette\Application\BadRequestException;
 use Nette\Http;
-use Nette\Security\SimpleIdentity;
 use Nette\Security\User;
 use Nette\Security\UserStorage;
 use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
