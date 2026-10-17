@@ -11,6 +11,7 @@ if (@!include __DIR__ . '/../vendor/autoload.php') {
 
 
 Tester\Environment::setup();
+Tester\Environment::setupFunctions();
 date_default_timezone_set('Europe/Prague');
 
 
@@ -27,9 +28,3 @@ $boot->createRobotLoader()
 	->register();
 
 return $boot->createContainer();
-
-
-function test(string $title, Closure $function): void
-{
-	$function();
-}

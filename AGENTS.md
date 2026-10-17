@@ -16,6 +16,12 @@ Use this file as package-specific guidance when working in this repository. Keep
 - `.github/`: CI workflows; keep their PHP versions and commands consistent with Composer and the package scripts.
 - `composer.json`: package metadata, dependency constraints, autoloading, and available Composer scripts.
 
+## Key Parts
+- `DI\KeycloakExtension` builds the provider; the HTTP request is autowired and the five connection options are required.
+- `KeycloakAdapter` runs on presenter startup: redirect to Keycloak, one-time state check, token exchange, resource owner. Provider errors become a generic 403 `BadRequestException` with the original as the previous exception.
+- `KeycloakSessions` stores the state, token, resource owner and backlink in the session.
+- Tests use a fake provider (`tests/Keycloak/KeycloakAdapter.phpt`); no Keycloak server is needed.
+
 ## Dependencies
 
 Composer constraints describe the package contract. Before changing integration behavior, inspect the source and the actual call sites in this package; do not infer runtime usage solely from dependency declarations.

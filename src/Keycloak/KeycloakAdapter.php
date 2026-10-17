@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drago\Keycloak;
 
 use League\OAuth2\Client\Token\AccessToken;
+use Nette\Application\BadRequestException;
 use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 use Throwable;
 
@@ -31,43 +32,37 @@ trait KeycloakAdapter
 					$presenter->redirectUrl($authUrl);
 				}
 
-			} elseif (empty($state) || ($state !== $keycloakSessions->getItems()->state)) {
+				return;
+			}
+
+			if (empty($state) || ($state !== $keycloakSessions->getItems()->state)) {
 				$keycloakSessions->removeAuthState();
-				$presenter->error(
-					'Invalid state, make sure HTTP sessions are enabled.',
-					403,
-				);
+				$presenter->error('Invalid state, make sure HTTP sessions are enabled.', 403);
+			}
 
-			} else {
-				$token = null;
+			// The state is valid for a single exchange only.
+			$keycloakSessions->removeAuthState();
 
+			// Details of provider errors stay in the exception chain for logs; users get a generic message.
+			try {
+				$token = $keycloak->getAccessToken('authorizationCode', [
+					'code' => $code,
+				]);
+			} catch (Throwable $e) {
+				throw new BadRequestException('Failed to get access token.', 403, $e);
+			}
+
+			$keycloakSessions->addAccessToken($token);
+			$presenter->backlink = $keycloakSessions->getItems()->backlink ?? '';
+
+			if ($token instanceof AccessToken) {
 				try {
-					$token = $keycloak->getAccessToken('authorizationCode', [
-						'code' => $code,
-					]);
-					$keycloakSessions->addAccessToken($token);
-					$backlinkValue = $keycloakSessions->getItems()->backlink ?? '';
-					$presenter->backlink = $backlinkValue;
-
+					$resourceOwner = $keycloak->getResourceOwner($token);
 				} catch (Throwable $e) {
-					$presenter->error(
-						'Failed to get access token: ' . $e->getMessage(),
-						403,
-					);
+					throw new BadRequestException('Failed to get resource owner.', 403, $e);
 				}
 
-				if ($token instanceof AccessToken) {
-					try {
-						$resourceOwner = $keycloak->getResourceOwner($token);
-						$keycloakSessions->addResourceOwner($resourceOwner);
-
-					} catch (Throwable $e) {
-						$presenter->error(
-							'Failed to get resource owner: ' . $e->getMessage(),
-							403,
-						);
-					}
-				}
+				$keycloakSessions->addResourceOwner($resourceOwner);
 			}
 		};
 	}
