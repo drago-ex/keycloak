@@ -19,11 +19,11 @@ class KeycloakExtension extends CompilerExtension
 	public function getConfigSchema(): Schema
 	{
 		return Expect::structure([
-			'authServerUrl' => Expect::string(),
-			'realm' => Expect::string(),
-			'clientId' => Expect::string(),
-			'clientSecret' => Expect::string(),
-			'redirectUri' => Expect::string(),
+			'authServerUrl' => Expect::string()->required(),
+			'realm' => Expect::string()->required(),
+			'clientId' => Expect::string()->required(),
+			'clientSecret' => Expect::string()->required(),
+			'redirectUri' => Expect::string()->required(),
 			'encryptionAlgorithm' => Expect::string(),
 			'encryptionKeyPath' => Expect::string(),
 			'encryptionKey' => Expect::string(),
@@ -65,9 +65,11 @@ class KeycloakExtension extends CompilerExtension
 		$builder->addDefinition($this->prefix('sessions'))
 			->setFactory(KeycloakSessions::class);
 
-		$request = $builder->getByType(Request::class);
-
+		// The HTTP request is autowired, so the order of extensions does not matter.
 		$builder->addDefinition($this->prefix('keycloak'))
-			->setFactory([self::class, 'createKeycloak'], ['@' . $request, $config, '@keycloak.guzzleHttp']);
+			->setFactory([self::class, 'createKeycloak'], [
+				'config' => $config,
+				'guzzleHttp' => '@' . $this->prefix('guzzleHttp'),
+			]);
 	}
 }

@@ -2,7 +2,7 @@
 
 Simple Keycloak adapter for easy integration.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/drago-ex/keycloak/blob/master/license)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/drago-ex/keycloak/blob/main/license)
 [![PHP version](https://badge.fury.io/ph/drago-ex%2Fkeycloak.svg)](https://badge.fury.io/ph/drago-ex%2Fkeycloak)
 [![Tests](https://github.com/drago-ex/keycloak/actions/workflows/tests.yml/badge.svg)](https://github.com/drago-ex/keycloak/actions/workflows/tests.yml)
 [![Coding Style](https://github.com/drago-ex/keycloak/actions/workflows/coding-style.yml/badge.svg)](https://github.com/drago-ex/keycloak/actions/workflows/coding-style.yml)
@@ -29,10 +29,13 @@ extensions:
 keycloak:
 
 	# https://github.com/stevenmaguire/oauth2-keycloak
+	# required
 	authServerUrl: keycloak-server-url
 	realm: keycloak-realm
 	clientId: keycloak-client-id
 	clientSecret: keycloak-client-secret
+
+	# required; an absolute URL, or a path completed with the host of the current request
 	redirectUri: https://example.com/callback-url
 
 	# optional
@@ -47,81 +50,83 @@ keycloak:
 
 ## Usage in Presenter
 
-In the presenter where you want to use Keycloak, we will extend it with `Drago\Keycloak\BasePresenter`
+Extend `Drago\Keycloak\BasePresenter` (it adds the persistent `$backlink` parameter) and use the
+`KeycloakAdapter` trait. On startup the trait:
+
+- redirects a guest without an authorization code to Keycloak and stores the OAuth state;
+- checks the returned state and answers 403 when it does not match; the state is valid for one exchange only;
+- exchanges the code for an access token and loads the resource owner into `KeycloakSessions`.
+
+Errors from Keycloak end with a generic 403 message; the original exception is kept as the previous
+exception for logging.
+
+The presenter then signs the user in from the resource owner, for example with your own authenticator:
+
 ```php
+use Drago\Keycloak\BasePresenter;
 use Drago\Keycloak\KeycloakAdapter;
+use Drago\Keycloak\KeycloakSessions;
+use Nette\Security\AuthenticationException;
+use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 
-public function __construct(
-  private Keycloak $keycloak,
-  private KeycloakSessions $keycloakSessions,
-) {
-  parent::__construct();
-}
-
-// Simple login
-protected function startup(): void
+final class AdminPresenter extends BasePresenter
 {
-  parent::startup();
-  if (!$this->getUser()->isLoggedIn()) {
-    $keycloakUser = $this->keycloakSessions->getItems()->resourceOwner;
-    $this->getUser()->login($keycloakUser->getName(), $keycloakUser->getId());
-    $this->redirect('redirect');
-  }
-}
+	use KeycloakAdapter;
 
-// Custom authentication with Keycloak attributes and backlink
-protected function startup(): void
-{
-  parent::startup();
-  if (!$this->getUser()->isLoggedIn()) {
-    $keycloakUser = $this->keycloakSessions->getItems()->resourceOwner;
+	public function __construct(
+		private readonly Keycloak $keycloak,
+		private readonly KeycloakSessions $keycloakSessions,
+		private readonly KeycloakAuthenticator $authenticator,
+	) {
+		parent::__construct();
+	}
 
-    try {
-      if ($keycloakUser) {
-        $user = $this->getUser();
 
-        // Custom authenticator
-        $user->setAuthenticator($this->authRepository);
+	protected function startup(): void
+	{
+		parent::startup();
+		$keycloakUser = $this->keycloakSessions->getItems()->resourceOwner;
+		if ($this->getUser()->isLoggedIn() || $keycloakUser === null) {
+			return;
+		}
 
-        // User login
-        $user->login($keycloakUser->getName(), $keycloakUser->getId());
+		try {
+			$this->getUser()->login($this->authenticator->authenticateOwner($keycloakUser));
+			$this->restoreRequest($this->backlink);
+			$this->redirect('this');
 
-        // Backlink handling
-        $this->restoreRequest($this->backlink);
-        $this->redirect(':Backend:Admin:');
-      }
+		} catch (AuthenticationException) {
+			$this->template->userLoginError = true;
+			$this->signOut();
+			$this->getHttpResponse()->setHeader('Refresh', '6; url=' . $this->keycloak->getLogoutUrl());
+		}
+	}
 
-    } catch (AuthenticationException $e) {
-      if ($e->getCode() === 1) {
-        $this->template->userLoginError = true;
-        $this->getUserLogout();
-		$redirect = $this->keycloak->getLogoutUrl();
-		$this->getHttpResponse()->setHeader('Refresh', '6; url=' . $redirect);
-      }
-    }
-  }
-}
 
-// User logout
-private function getUserLogout(): void
-{
-  $this->getUser()->logout();
-  $this->keycloakSessions->remove();
+	private function signOut(): void
+	{
+		$this->getUser()->logout();
+		$this->keycloakSessions->remove();
+	}
 }
 ```
+
+`KeycloakAuthenticator` stands for your own service that maps the Keycloak user (`getId()`, `getName()`,
+`getEmail()`, `toArray()`) to an identity of your application and throws `AuthenticationException` when
+the user is not allowed in.
 
 ### Error message in `@layout.latte`
 
 ```latte
 <body>
 {ifset $userLoginError}
-    <h1 class="text-danger text-center mt-5">
-        The user does not have the required attributes set in keycloak.
-    </h1>
+	<h1 class="text-danger text-center mt-5">
+		The user does not have the required attributes set in Keycloak.
+	</h1>
 {else}
-    {if $user->isLoggedIn()}
-        ...
-    {/if}
+	{if $user->isLoggedIn()}
+		...
+	{/if}
 {/ifset}
 </body>
 ```
@@ -129,14 +134,14 @@ private function getUserLogout(): void
 ### Items from Keycloak
 
 ```php
-
-// Get state, accessToken, and resource owner
-$this->keycloakSessions->getItems();
+// State, access token, resource owner and backlink
+$items = $this->keycloakSessions->getItems();
 ```
 
 ## User Logout Method
 
 ```php
+$this->getUser()->logout();
 $this->keycloakSessions->remove();
 $this->redirectUrl($this->keycloak->getLogoutUrl());
 ```
