@@ -22,7 +22,8 @@ class KeycloakExtension extends CompilerExtension
 			'authServerUrl' => Expect::string()->required(),
 			'realm' => Expect::string()->required(),
 			'clientId' => Expect::string()->required(),
-			'clientSecret' => Expect::string()->required(),
+			// a public client has no secret; without it no client_secret is sent
+			'clientSecret' => Expect::string(),
 			'redirectUri' => Expect::string()->required(),
 			'encryptionAlgorithm' => Expect::string(),
 			'encryptionKeyPath' => Expect::string(),

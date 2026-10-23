@@ -6,14 +6,19 @@ namespace Drago\Keycloak;
 
 use League\OAuth2\Client\Token\AccessToken;
 use Nette\Application\BadRequestException;
+use Nette\Application\UI\Presenter;
 use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 use Throwable;
 
 
+/**
+ * Signs in through Keycloak on presenter startup. The backlink of the first request is kept in
+ * KeycloakSessions (getItems()->backlink), so the presenter needs no persistent parameter for it.
+ */
 trait KeycloakAdapter
 {
 	public function injectKeycloakAuth(
-		BasePresenter $presenter,
+		Presenter $presenter,
 		Keycloak $keycloak,
 		KeycloakSessions $keycloakSessions,
 	): void
@@ -53,7 +58,6 @@ trait KeycloakAdapter
 			}
 
 			$keycloakSessions->addAccessToken($token);
-			$presenter->backlink = $keycloakSessions->getItems()->backlink ?? '';
 
 			if ($token instanceof AccessToken) {
 				try {

@@ -68,6 +68,35 @@ test('A relative redirect URI is completed with the host of the current request'
 });
 
 
+test('A public client works without a secret and sends no client_secret', function () {
+	$container = createContainer('
+		keycloak:
+			authServerUrl: https://sso.example.com
+			realm: realm
+			clientId: client
+			redirectUri: https://example.com/callback-url
+	');
+	Assert::type(Keycloak::class, $container->getByType(Keycloak::class));
+
+	$history = [];
+	$handler = GuzzleHttp\HandlerStack::create(new GuzzleHttp\Handler\MockHandler([
+		new GuzzleHttp\Psr7\Response(200, ['Content-Type' => 'application/json'], '{"access_token":"t","token_type":"bearer"}'),
+	]));
+	$handler->push(GuzzleHttp\Middleware::history($history));
+
+	$keycloak = KeycloakExtension::createKeycloak(
+		new Http\Request(new Http\UrlScript('https://app.example.com/admin')),
+		['authServerUrl' => 'https://sso.example.com', 'realm' => 'realm', 'clientId' => 'client', 'clientSecret' => null, 'redirectUri' => '/callback'],
+		new GuzzleHttp\Client(['handler' => $handler]),
+	);
+	$keycloak->getAccessToken('authorization_code', ['code' => 'c1']);
+
+	parse_str((string) $history[0]['request']->getBody(), $body);
+	Assert::same('client', $body['client_id']);
+	Assert::false(isset($body['client_secret']));
+});
+
+
 test('Required options must be configured', function () {
 	Assert::exception(
 		fn() => createContainer('

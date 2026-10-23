@@ -33,12 +33,13 @@ keycloak:
 	authServerUrl: keycloak-server-url
 	realm: keycloak-realm
 	clientId: keycloak-client-id
-	clientSecret: keycloak-client-secret
 
 	# required; an absolute URL, or a path completed with the host of the current request
 	redirectUri: https://example.com/callback-url
 
 	# optional
+	# only for a confidential client (Client authentication on); a public client has no secret
+	# clientSecret: keycloak-client-secret
 	# version: 21.0.1
 	# encryptionAlgorithm: 'RS256'
 	# encryptionKeyPath: '../key.pem'
@@ -50,12 +51,12 @@ keycloak:
 
 ## Usage in Presenter
 
-Extend `Drago\Keycloak\BasePresenter` (it adds the persistent `$backlink` parameter) and use the
-`KeycloakAdapter` trait. On startup the trait:
+Use the `KeycloakAdapter` trait in a presenter. On startup the trait:
 
 - redirects a guest without an authorization code to Keycloak and stores the OAuth state;
 - checks the returned state and answers 403 when it does not match; the state is valid for one exchange only;
-- exchanges the code for an access token and loads the resource owner into `KeycloakSessions`.
+- exchanges the code for an access token and loads the resource owner into `KeycloakSessions`;
+- keeps the `backlink` of the first request in `KeycloakSessions`, so the presenter can return there after sign-in.
 
 Errors from Keycloak end with a generic 403 message; the original exception is kept as the previous
 exception for logging.
@@ -63,13 +64,13 @@ exception for logging.
 The presenter then signs the user in from the resource owner, for example with your own authenticator:
 
 ```php
-use Drago\Keycloak\BasePresenter;
 use Drago\Keycloak\KeycloakAdapter;
 use Drago\Keycloak\KeycloakSessions;
+use Nette\Application\UI\Presenter;
 use Nette\Security\AuthenticationException;
 use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 
-final class AdminPresenter extends BasePresenter
+final class AdminPresenter extends Presenter
 {
 	use KeycloakAdapter;
 
@@ -92,7 +93,7 @@ final class AdminPresenter extends BasePresenter
 
 		try {
 			$this->getUser()->login($this->authenticator->authenticateOwner($keycloakUser));
-			$this->restoreRequest($this->backlink);
+			$this->restoreRequest($this->keycloakSessions->getItems()->backlink ?? '');
 			$this->redirect('this');
 
 		} catch (AuthenticationException) {
@@ -145,3 +146,9 @@ $this->getUser()->logout();
 $this->keycloakSessions->remove();
 $this->redirectUrl($this->keycloak->getLogoutUrl());
 ```
+
+## Upgrading from 2.x
+
+- `Drago\Keycloak\BasePresenter` was removed: use the trait in any presenter and take the backlink from
+  `$keycloakSessions->getItems()->backlink` instead of the persistent `$backlink`.
+- `clientSecret` is optional; leave it out for a public client instead of `clientSecret: ''`.

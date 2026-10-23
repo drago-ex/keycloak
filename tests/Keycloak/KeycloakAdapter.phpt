@@ -6,12 +6,12 @@
 
 declare(strict_types=1);
 
-use Drago\Keycloak\BasePresenter;
 use Drago\Keycloak\KeycloakAdapter;
 use Drago\Keycloak\KeycloakSessions;
 use League\OAuth2\Client\Token\AccessToken;
 use Nette\Application\AbortException;
 use Nette\Application\BadRequestException;
+use Nette\Application\UI\Presenter;
 use Nette\Http;
 use Nette\Security\User;
 use Nette\Security\UserStorage;
@@ -81,7 +81,7 @@ class MemoryUserStorage implements UserStorage
 }
 
 
-class KeycloakPresenter extends BasePresenter
+class KeycloakPresenter extends Presenter
 {
 	use KeycloakAdapter;
 
@@ -139,7 +139,7 @@ test('A valid code stores the token and the resource owner, and the state cannot
 	$items = $sessions->getItems();
 	Assert::same('token-c1', $items->accessToken?->getToken());
 	Assert::same('user-1', $items->resourceOwner?->getId());
-	Assert::same('back', $presenter->backlink);
+	Assert::same('back', $items->backlink);
 	Assert::null($items->state);
 });
 

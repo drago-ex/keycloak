@@ -7,7 +7,7 @@ Use this file as package-specific guidance when working in this repository. Keep
 - **Type**: library
 - **Purpose**: Simple Keycloak adapter for easy integration.
 - **PHP**: >=8.3 <9
-- **Runtime dependencies**: nette/application (^3.1), nette/http (^3.1), nette/di (^3.0), nette/security (^3.2), stevenmaguire/oauth2-keycloak (^6.1)
+- **Runtime dependencies**: nette/application (^3.2), nette/http (^3.1), nette/di (^3.0), nette/schema (^1.2), nette/security (^3.2), stevenmaguire/oauth2-keycloak (^6.1)
 - **License**: MIT
 
 ## Repository Layout
@@ -17,20 +17,20 @@ Use this file as package-specific guidance when working in this repository. Keep
 - `composer.json`: package metadata, dependency constraints, autoloading, and available Composer scripts.
 
 ## Key Parts
-- `DI\KeycloakExtension` builds the provider; the HTTP request is autowired and the five connection options are required.
-- `KeycloakAdapter` runs on presenter startup: redirect to Keycloak, one-time state check, token exchange, resource owner. Provider errors become a generic 403 `BadRequestException` with the original as the previous exception.
-- `KeycloakSessions` stores the state, token, resource owner and backlink in the session.
+- `DI\KeycloakExtension` builds the provider; the HTTP request is autowired; `authServerUrl`, `realm`, `clientId` and `redirectUri` are required, `clientSecret` is optional (a public client has none; league/oauth2-client builds the token request with http_build_query, which leaves out the null `client_secret`, tested with a Guzzle MockHandler).
+- `KeycloakAdapter` works in any `Presenter` (no base presenter, removed in 3.0; a persistent backlink would be added to every link) and runs on startup: redirect to Keycloak, one-time state check, token exchange, resource owner. Provider errors become a generic 403 `BadRequestException` with the original as the previous exception.
+- `KeycloakSessions` stores the state, token, resource owner and backlink in the session; the presenter reads the backlink from `getItems()->backlink` after sign-in.
 - Tests use a fake provider (`tests/Keycloak/KeycloakAdapter.phpt`); no Keycloak server is needed.
 
 ## Dependencies
 
 Composer constraints describe the package contract. Before changing integration behavior, inspect the source and the actual call sites in this package; do not infer runtime usage solely from dependency declarations.
-Development dependencies include nette/tester (^2.3), nette/bootstrap (^3.0), tracy/tracy (^2.10), phpstan/phpstan (^2.0), phpstan/phpstan-nette (^2.0).
+Development dependencies include nette/tester (^2.5), phpstan/phpstan (^2.0), phpstan/phpstan-nette (^2.0).
 
 ## Essential Commands
 
 ```bash
-composer tester                 # tester tests -s
+composer tester                 # tester tests -s -C
 composer phpstan                # phpstan analyse
 ```
 
