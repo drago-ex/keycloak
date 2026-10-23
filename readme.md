@@ -1,5 +1,7 @@
 # Drago Keycloak
 
+English | [Čeština](readme.cs.md)
+
 Simple Keycloak adapter for easy integration.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/drago-ex/keycloak/blob/main/license)
@@ -146,9 +148,3 @@ $this->getUser()->logout();
 $this->keycloakSessions->remove();
 $this->redirectUrl($this->keycloak->getLogoutUrl());
 ```
-
-## Upgrading from 2.x
-
-- `Drago\Keycloak\BasePresenter` was removed: use the trait in any presenter and take the backlink from
-  `$keycloakSessions->getItems()->backlink` instead of the persistent `$backlink`.
-- `clientSecret` is optional; leave it out for a public client instead of `clientSecret: ''`.
