@@ -14,6 +14,7 @@ use Throwable;
 /**
  * Signs in through Keycloak on presenter startup. The backlink of the first request is kept in
  * KeycloakSessions (getItems()->backlink), so the presenter needs no persistent parameter for it.
+ * The authorization code is protected by PKCE (S256).
  */
 trait KeycloakAdapter
 {
@@ -32,8 +33,12 @@ trait KeycloakAdapter
 			$user = $presenter->getUser();
 			if (!isset($code)) {
 				if (!$user->isLoggedIn()) {
-					$authUrl = $keycloak->getAuthorizationUrl();
-					$keycloakSessions->addAuthState($keycloak->getState(), is_string($backlink) ? $backlink : null);
+					$pkceCode = Pkce::createVerifier();
+					$authUrl = $keycloak->getAuthorizationUrl([
+						'code_challenge' => Pkce::challenge($pkceCode),
+						'code_challenge_method' => Pkce::Method,
+					]);
+					$keycloakSessions->addAuthState($keycloak->getState(), is_string($backlink) ? $backlink : null, $pkceCode);
 					$presenter->redirectUrl($authUrl);
 				}
 
@@ -45,8 +50,12 @@ trait KeycloakAdapter
 				$presenter->error('Invalid state, make sure HTTP sessions are enabled.', 403);
 			}
 
-			// The state is valid for a single exchange only.
+			// The state and the PKCE code are valid for a single exchange only.
+			$pkceCode = $keycloakSessions->getItems()->pkceCode;
 			$keycloakSessions->removeAuthState();
+			if ($pkceCode !== null) {
+				$keycloak->setPkceCode($pkceCode);
+			}
 
 			// Details of provider errors stay in the exception chain for logs; users get a generic message.
 			try {

@@ -17,6 +17,7 @@ class KeycloakSessions
 	private const string Token = 'accessToken';
 	private const string Resource = 'resourceOwner';
 	private const string Backlink = 'backlink';
+	private const string PkceCode = 'pkceCode';
 
 	private SessionSection $sessionSection;
 
@@ -34,19 +35,22 @@ class KeycloakSessions
 		$token = $this->sessionSection->get(self::Token);
 		$resource = $this->sessionSection->get(self::Resource);
 		$backlink = $this->sessionSection->get(self::Backlink);
+		$pkceCode = $this->sessionSection->get(self::PkceCode);
 
 		return new Items(
 			state: is_string($state) ? $state : null,
 			accessToken: $token instanceof AccessTokenInterface ? $token : null,
 			resourceOwner: $resource instanceof KeycloakResourceOwner ? $resource : null,
 			backlink: is_string($backlink) ? $backlink : null,
+			pkceCode: is_string($pkceCode) ? $pkceCode : null,
 		);
 	}
 
 
-	public function addAuthState(string $state, ?string $backlink): void
+	public function addAuthState(string $state, ?string $backlink, ?string $pkceCode = null): void
 	{
 		$this->sessionSection->set(self::State, $state);
+		$this->sessionSection->set(self::PkceCode, $pkceCode);
 
 		if ($backlink) {
 			$this->sessionSection->set(self::Backlink, $backlink);
@@ -57,6 +61,7 @@ class KeycloakSessions
 	public function removeAuthState(): void
 	{
 		$this->sessionSection->remove(self::State);
+		$this->sessionSection->remove(self::PkceCode);
 	}
 
 
@@ -88,6 +93,7 @@ class KeycloakSessions
 			self::Token,
 			self::Resource,
 			self::Backlink,
+			self::PkceCode,
 		];
 	}
 }

@@ -19,7 +19,8 @@ Use this file as package-specific guidance when working in this repository. Keep
 ## Key Parts
 - `DI\KeycloakExtension` builds the provider; the HTTP request is autowired; `authServerUrl`, `realm`, `clientId` and `redirectUri` are required, `clientSecret` is optional (a public client has none; league/oauth2-client builds the token request with http_build_query, which leaves out the null `client_secret`, tested with a Guzzle MockHandler).
 - `KeycloakAdapter` works in any `Presenter` (no base presenter, removed in 3.0; a persistent backlink would be added to every link) and runs on startup: redirect to Keycloak, one-time state check, token exchange, resource owner. Provider errors become a generic 403 `BadRequestException` with the original as the previous exception.
-- `KeycloakSessions` stores the state, token, resource owner and backlink in the session; the presenter reads the backlink from `getItems()->backlink` after sign-in.
+- PKCE (S256) is always on: `Pkce` creates the verifier and its challenge, the adapter adds `code_challenge` to the authorization URL, keeps the verifier with the state (one exchange only) and passes it with `setPkceCode()`, so league/oauth2-client sends `code_verifier`. The Keycloak provider itself has no PKCE switch (`getPkceMethod()` returns null). Keycloak checks a challenge whenever one was sent, for public and confidential clients.
+- `KeycloakSessions` stores the state, PKCE verifier, token, resource owner and backlink in the session; the presenter reads the backlink from `getItems()->backlink` after sign-in.
 - Tests use a fake provider (`tests/Keycloak/KeycloakAdapter.phpt`); no Keycloak server is needed.
 
 ## Dependencies

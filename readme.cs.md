@@ -55,7 +55,8 @@ keycloak:
 
 Použijte v presenteru trait `KeycloakAdapter`. Při startu trait:
 
-- přesměruje návštěvníka bez autorizačního kódu do Keycloaku a uloží stav OAuth;
+- přesměruje návštěvníka bez autorizačního kódu do Keycloaku a uloží stav OAuth a ověřovací kód PKCE
+  (S256; Keycloak dostane jen jeho otisk, takže ukradený kód nejde vyměnit, ani u veřejného klienta);
 - zkontroluje vrácený stav a při neshodě odpoví 403; stav platí jen pro jednu výměnu;
 - vymění kód za přístupový token a načte vlastníka zdroje do `KeycloakSessions`;
 - uloží `backlink` prvního požadavku do `KeycloakSessions`, aby se presenter mohl po přihlášení vrátit zpět.

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 use Drago\Keycloak\DI\KeycloakExtension;
 use Drago\Keycloak\KeycloakSessions;
+use Drago\Keycloak\Pkce;
 use Nette\DI\Compiler;
 use Nette\DI\Container;
 use Nette\DI\ContainerLoader;
@@ -68,7 +69,7 @@ test('A relative redirect URI is completed with the host of the current request'
 });
 
 
-test('A public client works without a secret and sends no client_secret', function () {
+test('A public client works without a secret, sends no client_secret and passes PKCE to Keycloak', function () {
 	$container = createContainer('
 		keycloak:
 			authServerUrl: https://sso.example.com
@@ -89,11 +90,21 @@ test('A public client works without a secret and sends no client_secret', functi
 		['authServerUrl' => 'https://sso.example.com', 'realm' => 'realm', 'clientId' => 'client', 'clientSecret' => null, 'redirectUri' => '/callback'],
 		new GuzzleHttp\Client(['handler' => $handler]),
 	);
+	// what KeycloakAdapter does: the challenge goes into the authorization URL, the verifier into the token request
+	parse_str((string) parse_url($keycloak->getAuthorizationUrl([
+		'code_challenge' => Pkce::challenge('verifier-1'),
+		'code_challenge_method' => Pkce::Method,
+	]), PHP_URL_QUERY), $query);
+	Assert::same(Pkce::challenge('verifier-1'), $query['code_challenge']);
+	Assert::same('S256', $query['code_challenge_method']);
+
+	$keycloak->setPkceCode('verifier-1');
 	$keycloak->getAccessToken('authorization_code', ['code' => 'c1']);
 
 	parse_str((string) $history[0]['request']->getBody(), $body);
 	Assert::same('client', $body['client_id']);
 	Assert::false(isset($body['client_secret']));
+	Assert::same('verifier-1', $body['code_verifier']);
 });
 
 

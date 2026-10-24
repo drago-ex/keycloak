@@ -15,6 +15,7 @@ class Items
 		public ?AccessTokenInterface $accessToken,
 		public ?KeycloakResourceOwner $resourceOwner,
 		public ?string $backlink,
+		public ?string $pkceCode = null,
 	) {
 	}
 }

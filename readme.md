@@ -55,7 +55,8 @@ keycloak:
 
 Use the `KeycloakAdapter` trait in a presenter. On startup the trait:
 
-- redirects a guest without an authorization code to Keycloak and stores the OAuth state;
+- redirects a guest without an authorization code to Keycloak and stores the OAuth state and the PKCE code verifier
+  (S256; Keycloak gets only its hash, so a stolen code cannot be exchanged, also for a public client);
 - checks the returned state and answers 403 when it does not match; the state is valid for one exchange only;
 - exchanges the code for an access token and loads the resource owner into `KeycloakSessions`;
 - keeps the `backlink` of the first request in `KeycloakSessions`, so the presenter can return there after sign-in.

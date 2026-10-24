@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 use Drago\Keycloak\KeycloakAdapter;
 use Drago\Keycloak\KeycloakSessions;
+use Drago\Keycloak\Pkce;
 use League\OAuth2\Client\Token\AccessToken;
 use Nette\Application\AbortException;
 use Nette\Application\BadRequestException;
@@ -26,6 +27,10 @@ class FakeKeycloak extends Keycloak
 {
 	public bool $failToken = false;
 
+	/** @var array<string, mixed> */
+	public array $authOptions = [];
+	public ?string $sentPkceCode = null;
+
 
 	public function __construct()
 	{
@@ -35,6 +40,7 @@ class FakeKeycloak extends Keycloak
 
 	public function getAuthorizationUrl(array $options = []): string
 	{
+		$this->authOptions = $options;
 		$this->state = 'expected-state';
 		return 'https://sso.example.com/auth';
 	}
@@ -42,6 +48,7 @@ class FakeKeycloak extends Keycloak
 
 	public function getAccessToken($grant, array $options = []): AccessToken
 	{
+		$this->sentPkceCode = $this->getPkceCode();
 		if ($this->failToken) {
 			throw new RuntimeException('Secret provider detail');
 		}
@@ -164,4 +171,32 @@ test('Removing the session data clears everything', function () {
 	Assert::null($items->state);
 	Assert::null($items->accessToken);
 	Assert::null($items->backlink);
+});
+
+
+test('The authorization URL carries an S256 challenge of the verifier kept in the session', function () {
+	[$presenter, $keycloak, $sessions] = createPresenter([]);
+
+	Assert::exception(fn() => $presenter->onStartup(), AbortException::class);
+	$verifier = (string) $sessions->getItems()->pkceCode;
+	Assert::match('%h%', $verifier);
+	Assert::same(64, strlen($verifier));
+	Assert::same('S256', $keycloak->authOptions['code_challenge_method']);
+	Assert::same(Pkce::challenge($verifier), $keycloak->authOptions['code_challenge']);
+});
+
+
+test('The code exchange sends the stored verifier, which cannot be used again', function () {
+	[$presenter, $keycloak, $sessions] = createPresenter(['code' => 'c1', 'state' => 'expected-state']);
+	$sessions->addAuthState('expected-state', null, 'verifier-1');
+
+	$presenter->onStartup();
+
+	Assert::same('verifier-1', $keycloak->sentPkceCode);
+	Assert::null($sessions->getItems()->pkceCode);
+});
+
+
+test('The challenge is the base64url SHA-256 of the verifier (example of RFC 7636)', function () {
+	Assert::same('E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM', Pkce::challenge('dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'));
 });
