@@ -31,16 +31,16 @@ extensions:
 keycloak:
 
 	# https://github.com/stevenmaguire/oauth2-keycloak
-	# povinné
+	# required
 	authServerUrl: keycloak-server-url
 	realm: keycloak-realm
 	clientId: keycloak-client-id
 
-	# povinné; absolutní URL, nebo cesta doplněná o host aktuálního požadavku
+	# required; an absolute URL, or a path completed with the host of the current request
 	redirectUri: https://example.com/callback-url
 
-	# volitelné
-	# jen pro důvěrného klienta (Client authentication zapnuté); veřejný klient nemá tajný klíč
+	# optional
+	# only for a confidential client (Client authentication on); a public client has no secret
 	# clientSecret: keycloak-client-secret
 	# version: 21.0.1
 	# encryptionAlgorithm: 'RS256'
@@ -127,7 +127,7 @@ uživatel nemá povolený přístup.
 <body>
 {ifset $userLoginError}
 	<h1 class="text-danger text-center mt-5">
-		Uživatel nemá v Keycloaku nastavené potřebné atributy.
+		The user does not have the required attributes set in Keycloak.
 	</h1>
 {else}
 	{if $user->isLoggedIn()}
@@ -140,7 +140,7 @@ uživatel nemá povolený přístup.
 ### Údaje z Keycloaku
 
 ```php
-// Stav, přístupový token, vlastník zdroje a backlink
+// State, PKCE verifier, access token, resource owner and backlink
 $items = $this->keycloakSessions->getItems();
 ```
 

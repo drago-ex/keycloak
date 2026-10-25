@@ -140,7 +140,7 @@ the user is not allowed in.
 ### Items from Keycloak
 
 ```php
-// State, access token, resource owner and backlink
+// State, PKCE verifier, access token, resource owner and backlink
 $items = $this->keycloakSessions->getItems();
 ```
 
