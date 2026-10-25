@@ -50,20 +50,26 @@ trait KeycloakAdapter
 				$presenter->error('Invalid state, make sure HTTP sessions are enabled.', 403);
 			}
 
-			// The state and the PKCE code are valid for a single exchange only.
+			// The state and the PKCE code are valid for a single exchange only. PKCE is always on: a sign-in
+			// without the verifier is refused, it is never exchanged without it.
 			$pkceCode = $keycloakSessions->getItems()->pkceCode;
 			$keycloakSessions->removeAuthState();
-			if ($pkceCode !== null) {
-				$keycloak->setPkceCode($pkceCode);
+			if ($pkceCode === null || $pkceCode === '') {
+				$presenter->error('Missing PKCE verifier, make sure HTTP sessions are enabled.', 403);
 			}
 
 			// Details of provider errors stay in the exception chain for logs; users get a generic message.
+			// The verifier is removed from the shared provider afterwards, so no later request sends it
+			// (an empty one is not sent, the provider checks !empty).
+			$keycloak->setPkceCode($pkceCode);
 			try {
 				$token = $keycloak->getAccessToken('authorizationCode', [
 					'code' => $code,
 				]);
 			} catch (Throwable $e) {
 				throw new BadRequestException('Failed to get access token.', 403, $e);
+			} finally {
+				$keycloak->setPkceCode('');
 			}
 
 			$keycloakSessions->addAccessToken($token);

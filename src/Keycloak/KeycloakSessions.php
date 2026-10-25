@@ -47,13 +47,19 @@ class KeycloakSessions
 	}
 
 
-	public function addAuthState(string $state, ?string $backlink, ?string $pkceCode = null): void
+	/**
+	 * Starts a sign-in: its state, the PKCE verifier (always required) and its backlink; a sign-in without
+	 * a backlink clears the one of an earlier sign-in, so it is not restored by mistake.
+	 */
+	public function addAuthState(string $state, ?string $backlink, string $pkceCode): void
 	{
 		$this->sessionSection->set(self::State, $state);
 		$this->sessionSection->set(self::PkceCode, $pkceCode);
 
-		if ($backlink) {
+		if ($backlink !== null && $backlink !== '') {
 			$this->sessionSection->set(self::Backlink, $backlink);
+		} else {
+			$this->sessionSection->remove(self::Backlink);
 		}
 	}
 

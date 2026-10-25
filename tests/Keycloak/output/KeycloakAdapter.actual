@@ -1,0 +1,7 @@
+League\OAuth2\Client\Token\AccessToken::__set_state(/* #979d */ [
+	'accessToken' => 'token-c1',
+	'expires' => null,
+	'refreshToken' => null,
+	'resourceOwnerId' => null,
+	'values' => [],
+])

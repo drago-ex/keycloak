@@ -128,7 +128,7 @@ test('A guest without a code is redirected to Keycloak and the state is stored',
 
 test('A code with a wrong state is rejected and the state is removed', function () {
 	[$presenter, , $sessions] = createPresenter(['code' => 'c1', 'state' => 'forged']);
-	$sessions->addAuthState('expected-state', null);
+	$sessions->addAuthState('expected-state', null, 'verifier');
 
 	$e = Assert::exception(fn() => $presenter->onStartup(), BadRequestException::class);
 	Assert::same(403, $e->getCode());
@@ -139,7 +139,7 @@ test('A code with a wrong state is rejected and the state is removed', function 
 
 test('A valid code stores the token and the resource owner, and the state cannot be reused', function () {
 	[$presenter, , $sessions] = createPresenter(['code' => 'c1', 'state' => 'expected-state']);
-	$sessions->addAuthState('expected-state', 'back');
+	$sessions->addAuthState('expected-state', 'back', 'verifier');
 
 	$presenter->onStartup();
 
@@ -153,7 +153,7 @@ test('A valid code stores the token and the resource owner, and the state cannot
 
 test('A failed token request shows a generic message and keeps the cause for logs', function () {
 	[$presenter, $keycloak, $sessions] = createPresenter(['code' => 'c1', 'state' => 'expected-state']);
-	$sessions->addAuthState('expected-state', null);
+	$sessions->addAuthState('expected-state', null, 'verifier');
 	$keycloak->failToken = true;
 
 	$e = Assert::exception(fn() => $presenter->onStartup(), BadRequestException::class, 'Failed to get access token.', 403);
@@ -163,7 +163,7 @@ test('A failed token request shows a generic message and keeps the cause for log
 
 test('Removing the session data clears everything', function () {
 	[, , $sessions] = createPresenter([]);
-	$sessions->addAuthState('state', 'back');
+	$sessions->addAuthState('state', 'back', 'verifier');
 	$sessions->addAccessToken(new AccessToken(['access_token' => 't']));
 	$sessions->remove();
 
@@ -199,4 +199,35 @@ test('The code exchange sends the stored verifier, which cannot be used again', 
 
 test('The challenge is the base64url SHA-256 of the verifier (example of RFC 7636)', function () {
 	Assert::same('E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM', Pkce::challenge('dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'));
+});
+
+
+test('A code without the stored PKCE verifier is refused, never exchanged without it', function () {
+	[$presenter, $keycloak, $sessions] = createPresenter(['code' => 'c1', 'state' => 'expected-state']);
+	$sessions->addAuthState('expected-state', null, 'verifier');
+	(new ReflectionProperty($sessions, 'sessionSection'))->getValue($sessions)->remove('pkceCode');
+
+	$e = Assert::exception(fn() => $presenter->onStartup(), BadRequestException::class);
+	Assert::same(403, $e->getCode());
+	Assert::null($keycloak->sentPkceCode);
+});
+
+
+test('After the exchange the verifier is removed from the provider, so later requests do not send it', function () {
+	[$presenter, $keycloak, $sessions] = createPresenter(['code' => 'c1', 'state' => 'expected-state']);
+	$sessions->addAuthState('expected-state', null, 'verifier-1');
+
+	$presenter->onStartup();
+
+	Assert::same('verifier-1', $keycloak->sentPkceCode);
+	Assert::same('', $keycloak->getPkceCode());
+});
+
+
+test('A sign-in without a backlink clears the backlink of an earlier one', function () {
+	[, , $sessions] = createPresenter([]);
+	$sessions->addAuthState('state-1', 'old', 'verifier');
+	$sessions->addAuthState('state-2', null, 'verifier');
+
+	Assert::null($sessions->getItems()->backlink);
 });
