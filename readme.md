@@ -1,7 +1,5 @@
 # Drago Keycloak
 
-English | [Čeština](readme.cs.md)
-
 Simple Keycloak adapter for easy integration.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/drago-ex/keycloak/blob/main/license)
