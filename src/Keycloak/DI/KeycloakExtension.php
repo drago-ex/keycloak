@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Drago\Keycloak\DI;
 
@@ -12,6 +10,7 @@ use Nette\Http\Url;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
 use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
+use function is_string;
 
 
 class KeycloakExtension extends CompilerExtension

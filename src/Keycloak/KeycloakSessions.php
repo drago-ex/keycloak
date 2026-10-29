@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Drago\Keycloak;
 
@@ -8,6 +6,7 @@ use League\OAuth2\Client\Token\AccessTokenInterface;
 use Nette\Http\Session;
 use Nette\Http\SessionSection;
 use Stevenmaguire\OAuth2\Client\Provider\KeycloakResourceOwner;
+use function is_string;
 
 
 /** Manages Keycloak session data including auth state, access token, and resource owner. */

@@ -1,10 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * Test: Drago\Keycloak\KeycloakAdapter
  */
-
-declare(strict_types=1);
 
 use Drago\Keycloak\KeycloakAdapter;
 use Drago\Keycloak\KeycloakSessions;
@@ -34,7 +32,13 @@ class FakeKeycloak extends Keycloak
 
 	public function __construct()
 	{
-		parent::__construct(['authServerUrl' => 'https://sso.example.com', 'realm' => 'realm', 'clientId' => 'client', 'clientSecret' => 'secret', 'redirectUri' => 'https://app.example.com/']);
+		parent::__construct([
+			'authServerUrl' => 'https://sso.example.com',
+			'realm' => 'realm',
+			'clientId' => 'client',
+			'clientSecret' => 'secret',
+			'redirectUri' => 'https://app.example.com/',
+		]);
 	}
 
 

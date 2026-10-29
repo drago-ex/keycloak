@@ -1,8 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 
-declare(strict_types=1);
-
-if (@!include __DIR__ . '/../vendor/autoload.php') {
+if (@!include __DIR__ . '/../vendor/autoload.php') { // @ dependencies may not be installed
 	echo 'Install Nette Tester using `composer install`';
 	exit(1);
 }
@@ -15,4 +13,4 @@ date_default_timezone_set('Europe/Prague');
 
 const TempDir = __DIR__ . '/tmp';
 
-@mkdir(TempDir);
+@mkdir(TempDir); // @ directory may already exist

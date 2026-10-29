@@ -1,10 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 
 /**
  * Test: Drago\Keycloak\DI\KeycloakExtension
  */
-
-declare(strict_types=1);
 
 use Drago\Keycloak\DI\KeycloakExtension;
 use Drago\Keycloak\KeycloakSessions;
@@ -61,7 +59,13 @@ test('The extension registers the sessions and the Keycloak provider', function 
 test('A relative redirect URI is completed with the host of the current request', function () {
 	$keycloak = KeycloakExtension::createKeycloak(
 		new Http\Request(new Http\UrlScript('https://app.example.com/admin')),
-		['authServerUrl' => 'https://sso.example.com', 'realm' => 'realm', 'clientId' => 'client', 'clientSecret' => 'secret', 'redirectUri' => '/sign/in?x=1'],
+		[
+			'authServerUrl' => 'https://sso.example.com',
+			'realm' => 'realm',
+			'clientId' => 'client',
+			'clientSecret' => 'secret',
+			'redirectUri' => '/sign/in?x=1',
+		],
 		new GuzzleHttp\Client,
 	);
 
@@ -87,7 +91,13 @@ test('A public client works without a secret, sends no client_secret and passes 
 
 	$keycloak = KeycloakExtension::createKeycloak(
 		new Http\Request(new Http\UrlScript('https://app.example.com/admin')),
-		['authServerUrl' => 'https://sso.example.com', 'realm' => 'realm', 'clientId' => 'client', 'clientSecret' => null, 'redirectUri' => '/callback'],
+		[
+			'authServerUrl' => 'https://sso.example.com',
+			'realm' => 'realm',
+			'clientId' => 'client',
+			'clientSecret' => null,
+			'redirectUri' => '/callback',
+		],
 		new GuzzleHttp\Client(['handler' => $handler]),
 	);
 	// what KeycloakAdapter does: the challenge goes into the authorization URL, the verifier into the token request

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Drago\Keycloak;
 
@@ -9,6 +7,7 @@ use Nette\Application\BadRequestException;
 use Nette\Application\UI\Presenter;
 use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 use Throwable;
+use function is_string;
 
 
 /**
