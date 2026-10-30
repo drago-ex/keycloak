@@ -2,6 +2,8 @@
 
 namespace Drago\Keycloak;
 
+use Random\RandomException;
+
 
 /**
  * Proof Key for Code Exchange (RFC 7636, method S256): the code verifier stays in the session
@@ -12,7 +14,10 @@ final class Pkce
 	public const string Method = 'S256';
 
 
-	/** Random code verifier, 64 characters (RFC 7636 allows 43 to 128). */
+	/**
+	 * Random code verifier, 64 characters (RFC 7636 allows 43 to 128).
+	 * @throws RandomException
+	 */
 	public static function createVerifier(): string
 	{
 		return bin2hex(random_bytes(32));
