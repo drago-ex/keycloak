@@ -1,6 +1,7 @@
 # Drago Keycloak
 
-Simple Keycloak adapter for easy integration.
+Sign-in through Keycloak for Nette: a DI extension for the OAuth2 provider and a presenter trait that
+handles the redirect, the state and PKCE check and the token exchange.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/drago-ex/keycloak/blob/main/license)
 [![PHP version](https://badge.fury.io/ph/drago-ex%2Fkeycloak.svg)](https://badge.fury.io/ph/drago-ex%2Fkeycloak)
