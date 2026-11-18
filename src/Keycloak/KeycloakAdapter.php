@@ -6,6 +6,7 @@ use League\OAuth2\Client\Token\AccessToken;
 use Nette\Application\BadRequestException;
 use Nette\Application\UI\Presenter;
 use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
+use Stevenmaguire\OAuth2\Client\Provider\KeycloakResourceOwner;
 use Throwable;
 use function is_string;
 
@@ -14,6 +15,10 @@ use function is_string;
  * Signs in through Keycloak on presenter startup. The backlink of the first request is kept in
  * KeycloakSessions (getItems()->backlink), so the presenter needs no persistent parameter for it.
  * The authorization code is protected by PKCE (S256).
+ *
+ * The handler is put first in onStartup, before the handlers registered earlier (e.g. an ACL check
+ * of a parent presenter, whose inject methods run first), so a guest reaches Keycloak and the code
+ * is exchanged before anything else may send the guest away.
  */
 trait KeycloakAdapter
 {
@@ -23,7 +28,7 @@ trait KeycloakAdapter
 		KeycloakSessions $keycloakSessions,
 	): void
 	{
-		$presenter->onStartup[] = function () use ($presenter, $keycloak, $keycloakSessions) {
+		array_unshift($presenter->onStartup, function () use ($presenter, $keycloak, $keycloakSessions) {
 			[$state, $code, $backlink] = array_map(
 				fn($i) => $presenter->getParameter($i),
 				['state', 'code', 'backlink'],
@@ -81,7 +86,18 @@ trait KeycloakAdapter
 				}
 
 				$keycloakSessions->addResourceOwner($resourceOwner);
+				$this->keycloakSignIn($resourceOwner);
 			}
-		};
+		});
+	}
+
+
+	/**
+	 * Called right after Keycloak returned the user, before the other startup handlers (e.g. an ACL check).
+	 * Override it to sign the user in to the application; by default it does nothing and the presenter
+	 * may sign the user in later, e.g. in startup() from KeycloakSessions.
+	 */
+	protected function keycloakSignIn(KeycloakResourceOwner $resourceOwner): void
+	{
 	}
 }

@@ -104,8 +104,22 @@ class KeycloakPresenter extends Presenter
 }
 
 
+/** Signs the user in by the hook, as an application with an ACL check on startup does. */
+class SignInPresenter extends KeycloakPresenter
+{
+	/** @var list<string> */
+	public array $calls = [];
+
+
+	protected function keycloakSignIn(KeycloakResourceOwner $resourceOwner): void
+	{
+		$this->calls[] = 'signIn:' . $resourceOwner->getId();
+	}
+}
+
+
 /** @return array{KeycloakPresenter, FakeKeycloak, KeycloakSessions} */
-function createPresenter(array $params): array
+function createPresenter(array $params, ?KeycloakPresenter $presenter = null): array
 {
 	$request = new Http\Request(new Http\UrlScript('https://app.example.com/'));
 	$response = new Http\Response;
@@ -113,7 +127,7 @@ function createPresenter(array $params): array
 	$sessions = new KeycloakSessions($session);
 	$keycloak = new FakeKeycloak;
 
-	$presenter = new KeycloakPresenter;
+	$presenter ??= new KeycloakPresenter;
 	$presenter->injectPrimary($request, $response, session: $session, user: new User(new MemoryUserStorage));
 	$presenter->setParams($params);
 	$presenter->injectKeycloakAuth($presenter, $keycloak, $sessions);
@@ -234,4 +248,40 @@ test('A sign-in without a backlink clears the backlink of an earlier one', funct
 	$sessions->addAuthState('state-2', null, 'verifier');
 
 	Assert::null($sessions->getItems()->backlink);
+});
+
+
+test('The handler runs before the startup handlers registered earlier (e.g. an ACL check of a parent)', function () {
+	$presenter = new SignInPresenter;
+	$presenter->onStartup[] = function () use ($presenter): void {
+		$presenter->calls[] = 'acl';
+	};
+	[$presenter, , $sessions] = createPresenter(['code' => 'c1', 'state' => 'expected-state'], $presenter);
+	$sessions->addAuthState('expected-state', null, 'verifier');
+
+	$presenter->onStartup();
+
+	Assert::same(['signIn:user-1', 'acl'], $presenter->calls);
+});
+
+
+test('A guest is sent to Keycloak before an earlier handler can send it elsewhere', function () {
+	$presenter = new SignInPresenter;
+	$presenter->onStartup[] = function () use ($presenter): void {
+		$presenter->calls[] = 'acl';
+	};
+	[$presenter] = createPresenter([], $presenter);
+
+	Assert::exception(fn() => $presenter->onStartup(), AbortException::class);
+	Assert::same([], $presenter->calls);
+});
+
+
+test('Without a resource owner the sign-in hook is not called', function () {
+	$presenter = new SignInPresenter;
+	[$presenter, , $sessions] = createPresenter(['code' => 'c1', 'state' => 'forged'], $presenter);
+	$sessions->addAuthState('expected-state', null, 'verifier');
+
+	Assert::exception(fn() => $presenter->onStartup(), BadRequestException::class);
+	Assert::same([], $presenter->calls);
 });
